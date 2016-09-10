@@ -10,10 +10,17 @@ public class MainActivity extends AppCompatActivity {
 
     Button btn;
 
+    // 'kibo-app-id' : '5wdqvvi8jyvfhxrxmu73dxun9za8x5u6n59',
+    // 'kibo-app-secret': 'jcmhec567tllydwhhy2z692l79j8bkxmaa98do1bjer16cdu5h79xvx',
+    // 'kibo-client-id': 'cd89f71715f2014725163952'
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        com.cloudkibo.kiboengage.KiboEngage.initialize("5wdqvvi8jyvfhxrxmu73dxun9za8x5u6n59", "cd89f71715f2014725163952",
+                "jcmhec567tllydwhhy2z692l79j8bkxmaa98do1bjer16cdu5h79xvx", "sojharo", "sojharo@live.com");
 
         btn = (Button) findViewById(R.id.button);
 

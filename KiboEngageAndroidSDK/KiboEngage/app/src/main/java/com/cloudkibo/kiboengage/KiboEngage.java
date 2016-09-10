@@ -7,7 +7,7 @@ public class KiboEngage {
 
     private static String appId;
 
-    private static String appKey;
+    private static String clientId;
 
     private static String appSecret;
 
@@ -15,13 +15,13 @@ public class KiboEngage {
 
     private static String customerEmail;
 
-    public static void initialize(String id, String key, String secret, String name, String email){
+    public static void initialize(String app_id, String client_id, String app_secret, String customer_name, String customer_email){
 
-        appId = id;
-        appKey = key;
-        appSecret = secret;
-        customerName = name;
-        customerEmail = email;
+        appId = app_id;
+        clientId = client_id;
+        appSecret = app_secret;
+        customerName = customer_name;
+        customerEmail = customer_email;
 
     }
 

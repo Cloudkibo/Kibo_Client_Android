@@ -1,0 +1,42 @@
+{
+  "project_info": {
+    "project_number": "626408245088",
+    "firebase_url": "https://kiboengage.firebaseio.com",
+    "project_id": "kiboengage",
+    "storage_bucket": "kiboengage.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:626408245088:android:7597ca86075391f0",
+        "android_client_info": {
+          "package_name": "com.cloudkibo.kiboengage"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "626408245088-otbcptcjc2rgnehcbqka2lpo9qe5step.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAzyVvrEjXqhObnFujKcjFRduq0KINfM58"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
