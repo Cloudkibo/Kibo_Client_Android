@@ -29,7 +29,7 @@
             android:layout_height="wrap_content"
             android:divider="@color/main_color_gray_lt"
             android:dividerHeight="1dp"
-            tools:listitem="@layout/kiboengage_sdk_chat_item" >
+            tools:listitem="@layout/kiboengage_sdk_list_item" >
         </ListView>
 
         <LinearLayout

@@ -23,7 +23,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.kiboengage_sdk_activity_main);
+        setContentView(R.layout.kiboengage_sdk_group_list);
 
         mainActivity = this;
         NotificationsManager.handleNotifications(this, NotificationSettings.SenderId, MyHandler.class);

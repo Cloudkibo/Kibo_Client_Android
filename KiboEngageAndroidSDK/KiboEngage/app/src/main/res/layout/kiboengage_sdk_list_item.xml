@@ -30,7 +30,7 @@
             android:layout_weight="1"
             android:layout_height="wrap_content"
             android:text="TextView"
-            android:textSize="@dimen/txt_15sp"
+            android:textSize="@dimen/txt_20sp"
             android:textColor="@color/main_color_green"
             android:lines="1"
             android:ellipsize="end"
@@ -45,28 +45,7 @@
             android:textColor="@color/main_color_green"
             />
         </LinearLayout>
-         <TextView
-            android:id="@+id/lblContactPhone"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="TextView"
-            android:visibility="invisible"
-            android:textSize="@dimen/txt_12sp"
-            android:textColor="@color/main_color_gray_dk"
-            android:lines="1"
-            android:ellipsize="end"
-            />
-          <TextView
-            android:id="@+id/lblContactStatus"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="TextView"
-            android:visibility="invisible"
-            android:textSize="@dimen/txt_12sp"
-            android:textColor="@color/main_color_gray_lt"
-            android:maxLines="2"
-            android:ellipsize="end"
-            />
+
 
     </LinearLayout>
 
