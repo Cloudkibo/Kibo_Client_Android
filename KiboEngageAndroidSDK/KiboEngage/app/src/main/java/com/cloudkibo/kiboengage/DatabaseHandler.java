@@ -13,14 +13,14 @@ import android.util.Log;
 
 import java.util.HashMap;
 
-import org.acra.ACRA;
+//import org.acra.ACRA;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import com.cloudkibo.database.CloudKiboDatabaseContract.Contacts;
-import com.cloudkibo.database.CloudKiboDatabaseContract.User;
-import com.cloudkibo.database.CloudKiboDatabaseContract.UserChat;
+//import com.cloudkibo.database.CloudKiboDatabaseContract.Contacts;
+//import com.cloudkibo.database.CloudKiboDatabaseContract.User;
+//import com.cloudkibo.database.CloudKiboDatabaseContract.UserChat;
 
 public class DatabaseHandler extends SQLiteOpenHelper {
 
@@ -28,7 +28,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     private static final int DATABASE_VERSION = 1;
 
     // Database Name
-    private static final String DATABASE_NAME = "cloudkibo";
+    private static final String DATABASE_NAME = "kiboengage";
 
 
 
@@ -107,7 +107,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     }
 
 
-
+/*
 
     /////////////////////////////////////////////////////////////////////
     // Upgrading Tables                                                //
@@ -645,10 +645,10 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     /////////////////////////////////////////////////////////////////////
 
 
-    /**
-     * Getting user login status
-     * return true if rows are there in table
-     * */
+    ///**
+    // * Getting user login status
+    // * return true if rows are there in table
+    // * *
     public int getRowCount() {
         String countQuery = "SELECT  * FROM " + User.TABLE_USER_NAME;
         SQLiteDatabase db = this.getReadableDatabase();
@@ -674,10 +674,10 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     }
 
 
-    /**
-     * Recreate database
-     * Delete all tables and create them again
-     * */
+    ///**
+    // * Recreate database
+    // * Delete all tables and create them again
+    // *
     public void resetTables(){
         try {
             SQLiteDatabase db = this.getWritableDatabase();
@@ -689,9 +689,9 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         }
     }
 
-    /**
-     * Delete all contacts Table
-     * */
+    ///**
+    // * Delete all contacts Table
+    // *
     public void resetContactsTable(){
         try {
             SQLiteDatabase db = this.getWritableDatabase();
@@ -703,9 +703,9 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         }
     }
 
-    /**
-     * Delete all chats Table
-     * */
+    ///**
+    // * Delete all chats Table
+    // *
     public void resetChatsTable(){
         try {
             SQLiteDatabase db = this.getWritableDatabase();
@@ -747,5 +747,5 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         db.execSQL(deleteQuery);
         db.close();
     }
-
+*/
 }
