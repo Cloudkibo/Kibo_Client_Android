@@ -7,8 +7,6 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.util.Log;
 
-import com.cloudkibo.MainActivity;
-
 import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.URL;
@@ -25,12 +23,12 @@ public class NetworkStateReceiver extends BroadcastReceiver {
             if(ni!=null && ni.getState()==NetworkInfo.State.CONNECTED) {
                 Log.i("NetworkStateReceiver","Network "+ni.getTypeName()+" connected");
                 //if(hasActiveInternetConnection(context)){
-                if (MainActivity.isVisible) {
+                //if (MainActivity.isVisible) {
                     //MainActivity.mainActivity.startSocketService();
-                    MainActivity.mainActivity.reconnectSocket();
-                    MainActivity.mainActivity.startSyncService();
+                    //MainActivity.mainActivity.reconnectSocket();
+                    //MainActivity.mainActivity.startSyncService();
                     //MainActivity.mainActivity.syncContacts();
-                }
+                //}
                 // }
             }
         }

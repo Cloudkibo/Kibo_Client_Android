@@ -107,7 +107,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     }
 
 
-/*
+
 
     /////////////////////////////////////////////////////////////////////
     // Upgrading Tables                                                //
@@ -323,7 +323,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     // Getting contacts data from database                             //
     /////////////////////////////////////////////////////////////////////
 
-
+/*
     public JSONArray getContacts() throws JSONException {
         JSONArray contacts = new JSONArray();
         String selectQuery = "SELECT  * FROM " + Contacts.TABLE_CONTACTS +" where on_cloudkibo='true'";
@@ -426,7 +426,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
 
 
-
+*/
     /////////////////////////////////////////////////////////////////////
     // Getting userchat data from database                             //
     /////////////////////////////////////////////////////////////////////
@@ -747,5 +747,5 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         db.execSQL(deleteQuery);
         db.close();
     }
-*/
+
 }
