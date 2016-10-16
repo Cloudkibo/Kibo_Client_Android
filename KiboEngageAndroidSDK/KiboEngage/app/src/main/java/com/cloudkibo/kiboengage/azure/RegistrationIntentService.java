@@ -44,7 +44,7 @@ public class RegistrationIntentService extends IntentService {
                 NotificationHub hub = new NotificationHub(NotificationSettings.HubName,
                         NotificationSettings.HubListenConnectionString, this);
                 Log.d(TAG, "Attempting a new registration with NH using FCM token : " + FCM_token);
-                Log.d(TAG, "Attempting a new registration with customer name : " + KiboEngage.getCustomerName());
+                Log.d(TAG, "Attempting a new registration with customer name : " + KiboEngage.getCustomerId());
                 regID = hub.register(FCM_token, "sojharo").getRegistrationId();
 
                 // If you want to use tags...
@@ -64,7 +64,7 @@ public class RegistrationIntentService extends IntentService {
                 NotificationHub hub = new NotificationHub(NotificationSettings.HubName,
                         NotificationSettings.HubListenConnectionString, this);
                 Log.d(TAG, "NH Registration refreshing with token : " + FCM_token);
-                Log.d(TAG, "NH Registration refreshing with customer name : " + KiboEngage.getCustomerName());
+                Log.d(TAG, "NH Registration refreshing with customer name : " + KiboEngage.getCustomerId());
                 regID = hub.register(FCM_token, "sojharo").getRegistrationId();
 
                 // If you want to use tags...
@@ -79,7 +79,7 @@ public class RegistrationIntentService extends IntentService {
             }
 
             else {
-                Log.d(TAG, "Previously Registered Successfully with customer name " + KiboEngage.getCustomerName());
+                Log.d(TAG, "Previously Registered Successfully with customer name " + KiboEngage.getCustomerId());
                 resultString = "Previously Registered Successfully - RegId : " + regID;
             }
         } catch (Exception e) {

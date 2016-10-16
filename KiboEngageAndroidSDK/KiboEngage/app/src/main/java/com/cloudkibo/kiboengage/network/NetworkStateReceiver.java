@@ -1,4 +1,4 @@
-package com.cloudkibo.kiboengage;
+package com.cloudkibo.kiboengage.network;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;
