@@ -516,7 +516,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     // * Getting user login status
     // * return true if rows are there in table
     // * *
-    public int getRowCount() {
+    public int getRowCountForUsers() {
         String countQuery = "SELECT  * FROM USERS";
         SQLiteDatabase db = this.getReadableDatabase();
         Cursor cursor = db.rawQuery(countQuery, null);
@@ -527,6 +527,19 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         // return row count
         return rowCount;
     }
+
+    public int getRowCountForSpecificSessions(String groupid, String channelid) {
+        String countQuery = "SELECT  * FROM SESSIONS WHERE group_id='"+ groupid +"' AND msg_channel_id='"+ channelid +"'";
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor cursor = db.rawQuery(countQuery, null);
+        int rowCount = cursor.getCount();
+        db.close();
+        cursor.close();
+
+        // return row count
+        return rowCount;
+    }
+
 
     ///**
     // * Recreate database

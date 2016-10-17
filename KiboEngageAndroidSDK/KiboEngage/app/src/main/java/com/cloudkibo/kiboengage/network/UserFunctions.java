@@ -31,6 +31,8 @@ public class UserFunctions {
     private static String fetchGroupsURL =          baseURL + "/api/departments/";
     private static String fetchChannelsURL =        baseURL + "/api/messagechannels/";
     private static String createSessionsURL =        baseURL + "/api/visitorcalls/createbulksession/";
+    private static String getSessionsURL =        baseURL + "/api/visitorcalls/getcustomersessions";
+
 
     //URL of the NODEJS API
     private static String loginURL =                baseURL + "/auth/local";
@@ -84,7 +86,6 @@ public class UserFunctions {
         return userdata;
     }
 
-
     public JSONArray getGroupsList(String appId, String clientId, String appSecret) {
         JSONArray contactslist = connection.getArrayFromServer(fetchGroupsURL, appId, clientId, appSecret);
         return contactslist;
@@ -95,8 +96,13 @@ public class UserFunctions {
         return contactslist;
     }
 
-    public JSONObject createSession(List<NameValuePair> params, String appId, String clientId, String appSecret) {
-        JSONObject userchatresponse = connection.sendObjectToServer(createSessionsURL, appId, clientId, appSecret, params);
+    public JSONArray getSessions(List<NameValuePair> params, String appId, String clientId, String appSecret) {
+        JSONArray userchatresponse = connection.sendArrayToServer(getSessionsURL, appId, clientId, appSecret, params);
+        return userchatresponse;
+    }
+
+    public JSONObject createSession(JSONObject params, String appId, String clientId, String appSecret) {
+        JSONObject userchatresponse = connection.sendJSONObjectToServer(createSessionsURL, appId, clientId, appSecret, params);
         return userchatresponse;
     }
 

@@ -6,6 +6,7 @@ import android.provider.ContactsContract;
 import android.util.Log;
 
 import com.cloudkibo.kiboengage.database.DatabaseHandler;
+import com.cloudkibo.kiboengage.library.Utility;
 import com.cloudkibo.kiboengage.network.UserFunctions;
 
 import org.apache.http.NameValuePair;
@@ -38,6 +39,8 @@ public class KiboEngage {
     private static String customerEmail;
 
     private static Context appContext;
+
+    private static JSONArray sessions;
 
     /**
      * Initializes the KiboEngage Widget for use. Must be called from onCreate() of Main Activity.
@@ -165,7 +168,9 @@ public class KiboEngage {
 
                         }
 
-                        createSessions();
+                        getSessions();
+
+                        //createSessions();
 
                     }
                 } catch (JSONException e) {
@@ -178,6 +183,57 @@ public class KiboEngage {
 
     }
 
+    private static void getSessions(){
+
+        new AsyncTask<String, String, JSONArray>() {
+
+            @Override
+            protected JSONArray doInBackground(String... args) {
+                UserFunctions userFunction = new UserFunctions();
+                List<NameValuePair> params = new ArrayList<NameValuePair>();
+                params.add(new BasicNameValuePair("customerid", customerId));
+                JSONArray json = userFunction.getSessions(params, appId, clientId, appSecret);
+                return json;
+            }
+
+            @Override
+            protected void onPostExecute(JSONArray jsonA) {
+
+                if (jsonA != null) {
+                    Log.d("KIBO_ENGAGE", "Get Sessions: "+ jsonA.toString());
+
+                    sessions = jsonA;
+
+                    createSessions();
+                }
+
+            }
+
+        }.execute();
+
+    }
+
+    private static Boolean isSessionOnServer(String groupid, String channelid){
+
+        for (int i=0; i < sessions.length(); i++) {
+            try {
+                JSONObject row = sessions.getJSONObject(i);
+
+                if(row.getString("departmentid").equals(groupid)){
+                     if(row.getJSONArray("messagechannel").getString(row.getJSONArray("messagechannel").length()-1).equals(channelid))
+                         return true;
+                }
+
+
+            }catch(JSONException e){
+                e.printStackTrace();
+            }
+
+        }
+
+        return false;
+    }
+
     private static void createSessions(){
 
         new AsyncTask<String, String, JSONObject>() {
@@ -185,76 +241,67 @@ public class KiboEngage {
             @Override
             protected JSONObject doInBackground(String... args) {
 
-                List<NameValuePair> params = new ArrayList<NameValuePair>();
-                params.add(new BasicNameValuePair("email", customerEmail));
-                params.add(new BasicNameValuePair("customerID", customerId));
-                params.add(new BasicNameValuePair("phone", customerPhone));
-                params.add(new BasicNameValuePair("country", "Pakistan"));
-                params.add(new BasicNameValuePair("companyid", clientId));
-                params.add(new BasicNameValuePair("platform", "mobile"));
-                params.add(new BasicNameValuePair("customerName", customerName));
-                params.add(new BasicNameValuePair("isMobile", "true"));
-                params.add(new BasicNameValuePair("status", "new"));
+                JSONObject jParams = new JSONObject();
+
                 JSONArray sessionInfo = new JSONArray();
                 try {
+                    jParams.put("email", customerEmail);
+                    jParams.put("customerID", customerId);
+                    jParams.put("phone", customerPhone);
+                    jParams.put("country", "Pakistan");
+                    jParams.put("companyid", clientId);
+                    jParams.put("platform", "mobile");
+                    jParams.put("customerName", customerName);
+                    jParams.put("isMobile", "true");
+                    jParams.put("status", "new");
+
                     DatabaseHandler db = new DatabaseHandler(appContext);
                     JSONArray groupsData = db.getGroups();
                     for (int i=0; i < groupsData.length(); i++) {
                         db = new DatabaseHandler(appContext);
                         JSONArray messageChannelsData = db.getMessageChannels(groupsData.getJSONObject(i).getString("groupid"));
                         for(int j=0; j< messageChannelsData.length(); j++){
-                            JSONObject sessionObj = new JSONObject();
-                            sessionObj.put("departmentid", groupsData.getJSONObject(i).getString("groupid"));
-                            sessionObj.put("messagechannel", messageChannelsData.getJSONObject(j).getString("channelid"));
 
                             String uniqueid = Long.toHexString(Double.doubleToLongBits(Math.random()));
                             uniqueid += (new Date().getYear()) + "" + (new Date().getMonth()) + "" + (new Date().getDay());
                             uniqueid += (new Date().getHours()) + "" + (new Date().getMinutes()) + "" + (new Date().getSeconds());
 
-                            sessionObj.put("request_id", uniqueid);
+                            String groupId = groupsData.getJSONObject(i).getString("groupid");
+                            String channelId = messageChannelsData.getJSONObject(j).getString("channelid");
 
-                            sessionInfo.put(sessionObj);
+                            if(!isSessionOnServer(groupId, channelId)) {
+                                JSONObject sessionObj = new JSONObject();
+                                sessionObj.put("departmentid", groupId);
+                                sessionObj.put("messagechannel", channelId);
+                                sessionObj.put("request_id", uniqueid);
+
+                                sessionInfo.put(sessionObj);
+                                Log.d("KIBO_ENGAGE", "Adding Session to server");
+                            } else { Log.d("KIBO_ENGAGE", "Skipping Session to server"); }
+
+                            db = new DatabaseHandler(appContext);
+                            int count = db.getRowCountForSpecificSessions(groupId, channelId);
+                            Log.d("KIBO_ENGAGE", "Count for getRowCountForSpecificSessions "+ count);
+                            if(count < 1) {
+                                db = new DatabaseHandler(appContext);
+                                db.addSession(groupId, channelId,
+                                        uniqueid, "", "", "", Utility.getCurrentTimeInISO());
+                                Log.d("KIBO_ENGAGE", "Adding Session to sqlite");
+                            }
                         }
                     }
+                    jParams.put("sessionInfo", sessionInfo);
                 }catch (JSONException e){
                     e.printStackTrace();
                 }
-                params.add(new BasicNameValuePair("sessionInfo", sessionInfo.toString()));
-                Log.d("KIBO_ENGAGE", "Object for create sessions: "+ params.toString());
                 UserFunctions userFunction = new UserFunctions();
-                JSONObject json = userFunction.createSession(params, appId, clientId, appSecret);
+                JSONObject json = userFunction.createSession(jParams, appId, clientId, appSecret);
                 return json;
             }
 
             @Override
             protected void onPostExecute(JSONObject jsonA) {
                 Log.d("KIBO_ENGAGE", "Create Sessions: "+ jsonA.toString());
-                /*try {
-
-                    if (jsonA != null) {
-
-                        DatabaseHandler db = new DatabaseHandler(
-                                appContext);
-
-                        db.resetMessageChannelsTable();
-
-                        db = new DatabaseHandler(appContext);
-
-                        for (int i=0; i < jsonA.length(); i++) {
-                            JSONObject row = jsonA.getJSONObject(i);
-                            Log.d("KIBO_ENGAGE", "Message Channels: "+ row.toString());
-
-                            db.addMessageChannel(row.getString("msg_channel_name"), row.getString("msg_channel_description"),
-                                    row.getString("companyid"), row.getString("groupid"), row.getString("createdby"),
-                                    row.getString("creationdate"), row.getString("activeStatus"));
-
-                        }
-
-                    }
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }*/
-
             }
 
         }.execute();
