@@ -16,7 +16,18 @@
             android:layout_height="wrap_content"
             android:textSize="@dimen/txt_20sp"
             android:textColor="@color/white"
-            android:text="Select the group" />
+            android:text="Select the group"
+            android:id="@+id/textView" />
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/imageBulkSMS"
+            android:src="@drawable/ic_notes"
+            android:layout_centerVertical="true"
+            android:layout_toEndOf="@+id/textView"
+            android:layout_marginStart="33dp" />
+
     </RelativeLayout>
     <RelativeLayout
         android:id="@+id/rel"

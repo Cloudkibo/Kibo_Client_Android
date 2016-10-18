@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/llaa"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:gravity="center_horizontal">
+
+    <RelativeLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        >
+
+        <LinearLayout
+            android:id="@+id/v1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@drawable/actionbar_bg"
+            android:gravity="center_vertical"
+            android:orientation="vertical"
+            android:paddingTop="@dimen/pad_5dp"
+            android:paddingBottom="@dimen/pad_5dp"
+            android:paddingLeft="@dimen/pad_20dp"
+            android:paddingRight="@dimen/pad_20dp"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentEnd="true"
+            android:layout_marginTop="@dimen/pad_5dp"
+            android:layout_marginLeft="@dimen/pad_20dp"
+            android:layout_marginRight="@dimen/pad_20dp">
+
+            <TextView
+                android:id="@+id/lbl2"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:paddingBottom="8dp"
+                android:text="Title"
+                android:textColor="@color/main_color_gray_dk"
+                android:textSize="@dimen/txt_20sp"
+                />
+
+            <TextView
+                android:id="@+id/lblContactDisplayName"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:paddingBottom="8dp"
+                android:text="This is a bulk sms content."
+                android:textColor="@color/main_color_gray_dk"
+                android:layout_gravity="left"
+                android:textSize="@dimen/txt_13sp" />
+
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/imageView"
+                android:src="@drawable/avatar"
+                android:layout_gravity="center_horizontal" />
+
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/lblContactPhone"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="25/09 12:35"
+            android:textColor="@color/main_color_gray"
+            android:textSize="@dimen/txt_14sp"
+            android:layout_alignRight="@+id/v1"
+            android:layout_below="@+id/v1"
+            android:layout_marginTop="@dimen/pad_5dp"
+            android:paddingRight="20dp"
+            android:paddingBottom="20dp"
+            />
+
+    </RelativeLayout>
+</LinearLayout>

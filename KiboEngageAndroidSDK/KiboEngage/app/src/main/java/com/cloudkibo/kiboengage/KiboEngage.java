@@ -262,9 +262,7 @@ public class KiboEngage {
                         JSONArray messageChannelsData = db.getMessageChannels(groupsData.getJSONObject(i).getString("groupid"));
                         for(int j=0; j< messageChannelsData.length(); j++){
 
-                            String uniqueid = Long.toHexString(Double.doubleToLongBits(Math.random()));
-                            uniqueid += (new Date().getYear()) + "" + (new Date().getMonth()) + "" + (new Date().getDay());
-                            uniqueid += (new Date().getHours()) + "" + (new Date().getMinutes()) + "" + (new Date().getSeconds());
+                            String uniqueid = Utility.generateUniqueId();
 
                             String groupId = groupsData.getJSONObject(i).getString("groupid");
                             String channelId = messageChannelsData.getJSONObject(j).getString("channelid");
@@ -276,17 +274,14 @@ public class KiboEngage {
                                 sessionObj.put("request_id", uniqueid);
 
                                 sessionInfo.put(sessionObj);
-                                Log.d("KIBO_ENGAGE", "Adding Session to server");
-                            } else { Log.d("KIBO_ENGAGE", "Skipping Session to server"); }
+                            }
 
                             db = new DatabaseHandler(appContext);
                             int count = db.getRowCountForSpecificSessions(groupId, channelId);
-                            Log.d("KIBO_ENGAGE", "Count for getRowCountForSpecificSessions "+ count);
                             if(count < 1) {
                                 db = new DatabaseHandler(appContext);
                                 db.addSession(groupId, channelId,
                                         uniqueid, "", "", "", Utility.getCurrentTimeInISO());
-                                Log.d("KIBO_ENGAGE", "Adding Session to sqlite");
                             }
                         }
                     }

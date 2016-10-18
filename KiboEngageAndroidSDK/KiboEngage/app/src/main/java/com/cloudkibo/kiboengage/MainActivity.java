@@ -19,6 +19,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.BaseAdapter;
+import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -41,6 +42,8 @@ public class MainActivity extends AppCompatActivity {
     private ArrayList<GroupItem> groupList;
     private GroupAdapter adp;
 
+    ImageView imageBulkSMS;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -50,6 +53,14 @@ public class MainActivity extends AppCompatActivity {
         mainActivity = this;
         NotificationsManager.handleNotifications(this, NotificationSettings.SenderId, MyHandler.class);
         registerWithNotificationHubs();
+
+        imageBulkSMS = (ImageView) findViewById(R.id.imageBulkSMS);
+        imageBulkSMS.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                startActivity(new Intent(getApplicationContext(), BulkSMSActivity.class));
+            }
+        });
 
         loadGroupList();
         ListView list = (ListView) findViewById(R.id.list);

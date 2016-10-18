@@ -12,6 +12,7 @@
         android:id="@+id/btnCamera"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:visibility="gone"
         android:background="@android:drawable/ic_menu_call" />
 
     <EditText
@@ -20,7 +21,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_weight="1"
-        android:hint="Type message here" >
+        android:hint="Type your message" >
 
         
     </EditText>

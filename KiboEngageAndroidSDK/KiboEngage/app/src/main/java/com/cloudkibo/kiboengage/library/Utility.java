@@ -69,6 +69,12 @@ public class Utility {
         return df.format(new Date());
     }
 
+    public static String generateUniqueId(){
+        String uniqueid = Long.toHexString(Double.doubleToLongBits(Math.random()));
+        uniqueid += (new Date().getYear()) + "" + (new Date().getMonth()) + "" + (new Date().getDay());
+        uniqueid += (new Date().getHours()) + "" + (new Date().getMinutes()) + "" + (new Date().getSeconds());
 
+        return uniqueid;
+    }
 
 }

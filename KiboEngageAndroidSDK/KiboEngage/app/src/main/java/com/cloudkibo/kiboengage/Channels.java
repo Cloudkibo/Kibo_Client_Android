@@ -1,6 +1,7 @@
 package com.cloudkibo.kiboengage;
 
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.LayoutInflater;
@@ -46,7 +47,7 @@ public class Channels extends AppCompatActivity {
             public void onItemClick(AdapterView<?> arg0, View arg1, int pos,
                                     long arg3)
             {
-
+                startActivity(new Intent(getApplicationContext(), GroupChat.class));
             }
         });
         adp.notifyDataSetChanged();
