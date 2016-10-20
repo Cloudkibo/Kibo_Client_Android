@@ -30,8 +30,10 @@ public class UserFunctions {
 
     private static String fetchGroupsURL =          baseURL + "/api/departments/";
     private static String fetchChannelsURL =        baseURL + "/api/messagechannels/";
-    private static String createSessionsURL =        baseURL + "/api/visitorcalls/createbulksession/";
-    private static String getSessionsURL =        baseURL + "/api/visitorcalls/getcustomersessions";
+    private static String createSessionsURL =       baseURL + "/api/visitorcalls/createbulksession/";
+    private static String getSessionsURL =          baseURL + "/api/visitorcalls/getcustomersessions";
+    private static String getBulkSMSURL =           baseURL + "/api/notifications/fetchbulksms";
+    private static String getBulkSMSListURL =           baseURL + "/api/notifications/";
 
 
     //URL of the NODEJS API
@@ -96,6 +98,11 @@ public class UserFunctions {
         return contactslist;
     }
 
+    public JSONArray getBulkSMSList(String appId, String clientId, String appSecret) {
+        JSONArray contactslist = connection.getArrayFromServer(getBulkSMSListURL, appId, clientId, appSecret);
+        return contactslist;
+    }
+
     public JSONArray getSessions(List<NameValuePair> params, String appId, String clientId, String appSecret) {
         JSONArray userchatresponse = connection.sendArrayToServer(getSessionsURL, appId, clientId, appSecret, params);
         return userchatresponse;
@@ -103,6 +110,11 @@ public class UserFunctions {
 
     public JSONObject createSession(JSONObject params, String appId, String clientId, String appSecret) {
         JSONObject userchatresponse = connection.sendJSONObjectToServer(createSessionsURL, appId, clientId, appSecret, params);
+        return userchatresponse;
+    }
+
+    public JSONObject getSpecificBulkSMS(List<NameValuePair> params, String appId, String clientId, String appSecret) {
+        JSONObject userchatresponse = connection.sendObjectToServer(getBulkSMSURL, appId, clientId, appSecret, params);
         return userchatresponse;
     }
 

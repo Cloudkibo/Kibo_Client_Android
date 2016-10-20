@@ -111,6 +111,17 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                 + "datetime TEXT" + ")";
         db.execSQL(CREATE_SESSIONS_TABLE);
 
+        String CREATE_BULK_SMS_TABLE = "CREATE TABLE BULKSMS ("
+                + "id INTEGER PRIMARY KEY,"
+                + "title TEXT,"
+                + "description TEXT,"
+                + "agent_id TEXT,"
+                + "hasImage TEXT,"
+                + "image_url TEXT,"
+                + "companyid TEXT,"
+                + "datetime TEXT" + ")";
+        db.execSQL(CREATE_BULK_SMS_TABLE);
+
     }
 
 
@@ -130,6 +141,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         db.execSQL("DROP TABLE IF EXISTS MESSAGECHANNELS");
         db.execSQL("DROP TABLE IF EXISTS CHATS");
         db.execSQL("DROP TABLE IF EXISTS SESSIONS");
+        db.execSQL("DROP TABLE IF EXISTS BULKSMS");
 
         // Create tables again
         onCreate(db);
@@ -249,7 +261,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     /////////////////////////////////////////////////////////////////////
 
     public void addSession(String group_id, String msg_channel_id, String request_id, String agent_email, String agent_id, String agent_name,
-                        String datetime) {
+                           String datetime) {
         SQLiteDatabase db = this.getWritableDatabase();
 
         ContentValues values = new ContentValues();
@@ -266,6 +278,28 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         db.close(); // Closing database connection
     }
 
+
+    /////////////////////////////////////////////////////////////////////
+    // Storing bulk sms details in database                            //
+    /////////////////////////////////////////////////////////////////////
+
+    public void addBulkSMS(String title, String description, String agent_id, String hasImage, String image_url, String companyid,
+                           String datetime) {
+        SQLiteDatabase db = this.getWritableDatabase();
+
+        ContentValues values = new ContentValues();
+        values.put("title", title);
+        values.put("description", description);
+        values.put("agent_id", agent_id);
+        values.put("hasImage", hasImage);
+        values.put("image_url", image_url);
+        values.put("companyid", companyid);
+        values.put("datetime", datetime);
+
+        // Inserting Row
+        db.insert("BULKSMS", null, values);
+        db.close(); // Closing database connection
+    }
 
 /*
 
@@ -508,6 +542,43 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
 
     /////////////////////////////////////////////////////////////////////
+    // Getting bulk sms data from database                             //
+    /////////////////////////////////////////////////////////////////////
+
+
+    public JSONArray getBulkSMS() throws JSONException {
+        JSONArray bulkSMSs = new JSONArray();
+        String selectQuery = "SELECT  * FROM BULKSMS";
+
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor cursor = db.rawQuery(selectQuery, null);
+        // Move to first row
+        cursor.moveToFirst();
+        if(cursor.getCount() > 0){
+
+            while (cursor.isAfterLast() != true) {
+
+                JSONObject bulkSms = new JSONObject();
+                bulkSms.put("title", cursor.getString(1));
+                bulkSms.put("description", cursor.getString(2));
+                bulkSms.put("agent_id", cursor.getString(3));
+                bulkSms.put("hasImage", cursor.getString(4));
+                bulkSms.put("image_url", cursor.getString(5));
+                bulkSms.put("companyid", cursor.getString(6));
+                bulkSms.put("datetime", cursor.getString(7));
+
+                bulkSMSs.put(bulkSms);
+
+                cursor.moveToNext();
+            }
+        }
+        cursor.close();
+        db.close();
+        // return user
+        return bulkSMSs;
+    }
+
+    /////////////////////////////////////////////////////////////////////
     // Other functions                                                 //
     /////////////////////////////////////////////////////////////////////
 
@@ -530,6 +601,18 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
     public int getRowCountForSpecificSessions(String groupid, String channelid) {
         String countQuery = "SELECT  * FROM SESSIONS WHERE group_id='"+ groupid +"' AND msg_channel_id='"+ channelid +"'";
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor cursor = db.rawQuery(countQuery, null);
+        int rowCount = cursor.getCount();
+        db.close();
+        cursor.close();
+
+        // return row count
+        return rowCount;
+    }
+
+    public int getRowCountForBulkSMS() {
+        String countQuery = "SELECT  * FROM BULKSMS";
         SQLiteDatabase db = this.getReadableDatabase();
         Cursor cursor = db.rawQuery(countQuery, null);
         int rowCount = cursor.getCount();
@@ -600,6 +683,17 @@ public class DatabaseHandler extends SQLiteOpenHelper {
             SQLiteDatabase db = this.getWritableDatabase();
             // Delete All Rows
             db.delete("SESSIONS", null, null);
+            db.close();
+        }catch(SQLiteDatabaseLockedException e){
+            e.printStackTrace();
+        }
+    }
+
+    public void resetBulkSMSTable(){
+        try {
+            SQLiteDatabase db = this.getWritableDatabase();
+            // Delete All Rows
+            db.delete("BULKSMS", null, null);
             db.close();
         }catch(SQLiteDatabaseLockedException e){
             e.printStackTrace();

@@ -169,6 +169,7 @@ public class KiboEngage {
                         }
 
                         getSessions();
+                        loadBulkSMS();
 
                         //createSessions();
 
@@ -300,6 +301,55 @@ public class KiboEngage {
             }
 
         }.execute();
+
+    }
+
+    private static void loadBulkSMS(){
+
+        DatabaseHandler db2 = new DatabaseHandler(appContext);
+        int bulkSMSCount = db2.getRowCountForBulkSMS();
+
+        if(bulkSMSCount < 1){
+            new AsyncTask<String, String, JSONArray>() {
+
+                @Override
+                protected JSONArray doInBackground(String... args) {
+                    UserFunctions userFunction = new UserFunctions();
+                    JSONArray json = userFunction.getBulkSMSList(appId, clientId, appSecret);
+                    return json;
+                }
+
+                @Override
+                protected void onPostExecute(JSONArray jsonA) {
+                    try {
+
+                        if (jsonA != null) {
+
+                            DatabaseHandler db = new DatabaseHandler(
+                                    appContext);
+
+                            db.resetMessageChannelsTable();
+
+                            db = new DatabaseHandler(appContext);
+
+                            for (int i=0; i < jsonA.length(); i++) {
+                                JSONObject row = jsonA.getJSONObject(i);
+                                Log.d("KIBO_ENGAGE", "Bulk SMS: "+ row.toString());
+
+                                db.addBulkSMS(row.getString("title"), row.getString("description"),
+                                        row.getString("agent_id"), row.getString("hasImage"), row.getString("image_url"),
+                                        row.getString("companyid"), row.getString("datetime"));
+
+                            }
+                        }
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+
+                }
+
+            }.execute();
+        }
 
     }
 

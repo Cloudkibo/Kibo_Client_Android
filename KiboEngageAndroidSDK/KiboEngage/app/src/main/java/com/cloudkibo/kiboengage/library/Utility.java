@@ -1,14 +1,24 @@
 package com.cloudkibo.kiboengage.library;
 
+import android.content.Context;
 import android.os.AsyncTask;
+import android.util.Log;
 
+import com.cloudkibo.kiboengage.database.DatabaseHandler;
+import com.cloudkibo.kiboengage.network.UserFunctions;
+
+import org.apache.http.NameValuePair;
+import org.apache.http.message.BasicNameValuePair;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Locale;
 import java.util.TimeZone;
 
@@ -75,6 +85,46 @@ public class Utility {
         uniqueid += (new Date().getHours()) + "" + (new Date().getMinutes()) + "" + (new Date().getSeconds());
 
         return uniqueid;
+    }
+
+    public static void loadBulkSmsFromServer(final Context ctx, final String uniqueid) {
+
+        new AsyncTask<String, String, JSONObject>() {
+
+            @Override
+            protected JSONObject doInBackground(String... args) {
+                DatabaseHandler db = new DatabaseHandler(ctx);
+                HashMap<String, String> user = db.getUserDetails();
+                List<NameValuePair> params = new ArrayList<NameValuePair>();
+                params.add(new BasicNameValuePair("id", uniqueid));
+                UserFunctions userFunction = new UserFunctions();
+                return userFunction.getSpecificBulkSMS(params, user.get("appId"), user.get("clientId"), user.get("appSecret"));
+            }
+
+            @Override
+            protected void onPostExecute(JSONObject row) {
+                try {
+
+                    if (row != null) {
+                        DatabaseHandler db = new DatabaseHandler(
+                                ctx);
+
+                        Log.i("MyHandler", row.toString());
+
+                        db.addBulkSMS(row.getString("title"), row.getString("description"),
+                                row.getString("agent_id"), row.getString("hasImage"), row.getString("image_url"),
+                                row.getString("companyid"), row.getString("datetime"));
+
+                    } else {
+                        //Utility.sendLogToServer(""+ userDetail.get("phone") +" did not get message from API. SERVER gave NULL");
+                    }
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+
+        }.execute();
+
     }
 
 }
