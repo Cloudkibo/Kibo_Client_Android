@@ -249,7 +249,7 @@ public class KiboEngage {
                     jParams.put("email", customerEmail);
                     jParams.put("customerID", customerId);
                     jParams.put("phone", customerPhone);
-                    jParams.put("country", "Pakistan");
+                    //jParams.put("country", "Pakistan");
                     jParams.put("companyid", clientId);
                     jParams.put("platform", "mobile");
                     jParams.put("customerName", customerName);
@@ -328,7 +328,7 @@ public class KiboEngage {
                             DatabaseHandler db = new DatabaseHandler(
                                     appContext);
 
-                            db.resetMessageChannelsTable();
+                            db.resetBulkSMSTable();
 
                             db = new DatabaseHandler(appContext);
 
@@ -337,7 +337,8 @@ public class KiboEngage {
                                 Log.d("KIBO_ENGAGE", "Bulk SMS: "+ row.toString());
 
                                 db.addBulkSMS(row.getString("title"), row.getString("description"),
-                                        row.getString("agent_id"), row.getString("hasImage"), row.getString("image_url"),
+                                        row.getString("agent_id"), row.getString("hasImage"),
+                                        (row.has("image_url")) ? row.getString("image_url") : "",
                                         row.getString("companyid"), row.getString("datetime"));
 
                             }

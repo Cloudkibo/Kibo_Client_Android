@@ -8,6 +8,7 @@ import com.cloudkibo.kiboengage.azure.MyHandler;
 import com.cloudkibo.kiboengage.azure.NotificationSettings;
 import com.cloudkibo.kiboengage.azure.RegistrationIntentService;
 import com.cloudkibo.kiboengage.database.DatabaseHandler;
+import com.cloudkibo.kiboengage.model.ChannelItem;
 import com.cloudkibo.kiboengage.model.GroupItem;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
@@ -72,7 +73,9 @@ public class MainActivity extends AppCompatActivity {
             public void onItemClick(AdapterView<?> arg0, View arg1, int pos,
                                     long arg3)
             {
-                startActivity(new Intent(getApplicationContext(), Channels.class));
+                Intent i = new Intent(getApplicationContext(), Channels.class);
+                i.putExtra("groupid", groupList.get(pos).getUniqueid());
+                startActivity(i);
             }
         });
         adp.notifyDataSetChanged();
@@ -92,7 +95,7 @@ public class MainActivity extends AppCompatActivity {
                 JSONObject row = chats.getJSONObject(i);
 
                 tempGroupList.add(new GroupItem(
-                        row.getString("deptname")
+                        row.getString("deptname"), row.getString("groupid")
                         ));
 
             }

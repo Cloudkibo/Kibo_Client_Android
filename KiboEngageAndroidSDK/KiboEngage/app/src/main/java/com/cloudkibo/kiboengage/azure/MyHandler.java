@@ -6,18 +6,28 @@ import android.content.Context;
 import android.content.Intent;
 import android.media.RingtoneManager;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.NotificationCompat;
+import android.util.Log;
 
 import com.cloudkibo.kiboengage.BulkSMSActivity;
 import com.cloudkibo.kiboengage.MainActivity;
 import com.cloudkibo.kiboengage.R;
+import com.cloudkibo.kiboengage.database.DatabaseHandler;
 import com.cloudkibo.kiboengage.library.Utility;
 import com.cloudkibo.kiboengage.model.BulkSMS;
+import com.cloudkibo.kiboengage.network.UserFunctions;
 import com.microsoft.windowsazure.notifications.NotificationsHandler;
 
+import org.apache.http.NameValuePair;
+import org.apache.http.message.BasicNameValuePair;
 import org.json.JSONException;
 import org.json.JSONObject;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 
 /**
  * Created by sojharo on 09/09/2016.
@@ -44,8 +54,8 @@ public class MyHandler extends NotificationsHandler {
             payload = new JSONObject(msg);
             payload = payload.getJSONObject("data");
             if(payload.has("type")){
-                Utility.loadBulkSmsFromServer(ctx, payload.getString("uniqueid      "));
-                sendNotification(payload.getString("type"), "Promotional Message", payload.getString("title"));
+                if(payload.getString("type").equals("bulksms"))
+                    loadBulkSmsFromServer(payload);
             } else {
                 sendNotification(msg);
             }
@@ -105,5 +115,57 @@ public class MyHandler extends NotificationsHandler {
 
         mBuilder.setContentIntent(contentIntent);
         mNotificationManager.notify(NOTIFICATION_ID, mBuilder.build());
+    }
+
+    private void loadBulkSmsFromServer(JSONObject payload) {
+
+        try {
+            final String uniqueid = payload.getString("uniqueid");
+
+            new AsyncTask<String, String, JSONObject>() {
+
+                @Override
+                protected JSONObject doInBackground(String... args) {
+                    DatabaseHandler db = new DatabaseHandler(ctx);
+                    HashMap<String, String> user = db.getUserDetails();
+                    List<NameValuePair> params = new ArrayList<NameValuePair>();
+                    params.add(new BasicNameValuePair("id", uniqueid));
+                    UserFunctions userFunction = new UserFunctions();
+                    return userFunction.getSpecificBulkSMS(params, user.get("appId"), user.get("clientId"), user.get("appSecret"));
+                }
+
+                @Override
+                protected void onPostExecute(JSONObject row) {
+                    try {
+
+                        if (row != null) {
+                            DatabaseHandler db = new DatabaseHandler(
+                                    ctx);
+
+                            Log.i("MyHandler", row.toString());
+
+                            db.addBulkSMS(row.getString("title"), row.getString("description"),
+                                    row.getString("agent_id"), row.getString("hasImage"),
+                                    (row.has("image_url")) ? row.getString("image_url") : "",
+                                    row.getString("companyid"), row.getString("datetime"));
+
+                            String description = row.getString("description");
+                            if(description.length() > 30) description = description.substring(0, 29);
+                            if(BulkSMSActivity.isVisible) BulkSMSActivity.bulkSMSActivity.ToastNotify(row);
+                            else sendNotification("bulksms", description, row.getString("title"));
+
+                        } else {
+                            //Utility.sendLogToServer(""+ userDetail.get("phone") +" did not get message from API. SERVER gave NULL");
+                        }
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                }
+
+            }.execute();
+        }catch(JSONException e){
+            e.printStackTrace();
+        }
+
     }
 }

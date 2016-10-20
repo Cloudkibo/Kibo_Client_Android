@@ -32,10 +32,14 @@ public class Channels extends AppCompatActivity {
     private ArrayList<ChannelItem> channelList;
     private ChannelAdapter adp;
 
+    private String groupid;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.kiboengage_sdk_message_channel);
+
+        groupid = getIntent().getExtras().getString("groupid");
 
         loadChannelList();
         ListView list = (ListView) findViewById(R.id.list);
@@ -61,7 +65,7 @@ public class Channels extends AppCompatActivity {
 
             ArrayList<ChannelItem> tempChannelList = new ArrayList<ChannelItem>();
 
-            JSONArray chats = db.getMessageChannels(); // todo change to just group id
+            JSONArray chats = db.getMessageChannels(groupid); // todo change to just group id
 
             for (int i=0; i < chats.length(); i++) {
                 JSONObject row = chats.getJSONObject(i);

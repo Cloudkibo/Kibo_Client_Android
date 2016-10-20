@@ -5,6 +5,7 @@ package com.cloudkibo.kiboengage;
  */
 
 import android.content.Context;
+import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.LayoutInflater;
@@ -19,7 +20,13 @@ import android.widget.TextView;
 import com.cloudkibo.kiboengage.database.DatabaseHandler;
 import com.cloudkibo.kiboengage.library.Utility;
 import com.cloudkibo.kiboengage.model.BulkSMS;
+import com.cloudkibo.kiboengage.model.GroupItem;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.text.ParseException;
 import java.util.ArrayList;
 
 
@@ -38,6 +45,9 @@ public class BulkSMSActivity extends AppCompatActivity
     /** The chat adapter. */
     private BulkSMSAdapter adp;
 
+    public static BulkSMSActivity bulkSMSActivity;
+    public static Boolean isVisible = false;
+
 
     /* (non-Javadoc)
      * @see android.support.v4.app.Fragment#onCreateView(android.view.LayoutInflater, android.view.ViewGroup, android.os.Bundle)
@@ -48,15 +58,7 @@ public class BulkSMSActivity extends AppCompatActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.kiboengage_sdk_bulk_sms);
 
-		/*contactName = this.getArguments().getString("contactusername");
-
-		contactPhone = this.getArguments().getString("contactphone");
-
-		authtoken = this.getArguments().getString("authtoken");*/
-
-		/*DatabaseHandler db = new DatabaseHandler(getActivity().getApplicationContext());
-
-		user = db.getUserDetails();*/
+        bulkSMSActivity = this;
 
         loadConversationList();
 
@@ -70,42 +72,26 @@ public class BulkSMSActivity extends AppCompatActivity
 
     }
 
-	/* (non-Javadoc)
-	 * @see com.socialshare.custom.CustomFragment#onClick(android.view.View)
-	 */
-    //@Override
-	/*public void onClick(View v)
-	{
-		super.onClick(v);
-		if (v.getId() == R.id.btnSend)
-		{
-			sendMessage();
-		} else if (v.getId() == R.id.btnCamera) {
-			MainActivity act1 = (MainActivity)getActivity();
 
-			act1.callThisPerson(contactPhone,
-					 contactName);
-		}
+    public void receiveMessage(JSONObject row) {
 
-	}*/
-
-
-    public void receiveMessage(String msg, String uniqueid, String from, String date) {
-
-		/*try {
+		try {
 
 			final MediaPlayer mp = MediaPlayer.create(getApplicationContext(), R.raw.bell);
 			mp.start();
 
 			// todo see if this really needs the uniqueid and status
-			convList.add(new Conversation(msg, Utility.convertDateToLocalTimeZoneAndReadable(date), false, true, "seen", uniqueid));
+			convList.add(new BulkSMS(row.getString("title"), row.getString("description"),
+                    Utility.convertDateToLocalTimeZoneAndReadable(row.getString("datetime")), -1));
 
-			adp.notifyDataSetChanged();
+            if(adp != null)
+			    adp.notifyDataSetChanged();
 
-			sendMessageStatusUsingAPI("seen", uniqueid, from);
-		} catch (ParseException e){
+		} catch (JSONException e){
 			e.printStackTrace();
-		}*/
+		} catch (ParseException e){
+            e.printStackTrace();
+        }
 
     }
 
@@ -129,19 +115,15 @@ public class BulkSMSActivity extends AppCompatActivity
 
         try {
 
-            //JSONArray jsonA = db.getChat(act1.getUserPhone(), contactPhone);
+            JSONArray jsonA = db.getBulkSMS();
 
             ArrayList<BulkSMS> chatList1 = new ArrayList<BulkSMS>();
 
-            chatList1.add(new BulkSMS("Summer Sale", "We are delighted to let our customers know about Summer Sale 2016. You would be happy to know that with coupon you can avail upto 60% discount on our products.",
-                    Utility.convertDateToLocalTimeZoneAndReadable(Utility.getCurrentTimeInISO()), -1));
-
-            chatList1.add(new BulkSMS("Summer Sale", "We are delighted to let our customers know about Summer Sale 2016. You would be happy to know that with coupon you can avail upto 60% discount on our products.",
-                    Utility.convertDateToLocalTimeZoneAndReadable(Utility.getCurrentTimeInISO()), R.drawable.avatar));
-
-            chatList1.add(new BulkSMS("Summer Sale", "We are delighted to let our customers know about Summer Sale 2016. You would be happy to know that with coupon you can avail upto 60% discount on our products.",
-                    Utility.convertDateToLocalTimeZoneAndReadable(Utility.getCurrentTimeInISO()), -1));
-
+            for (int i=0; i < jsonA.length(); i++) {
+                JSONObject row = jsonA.getJSONObject(i);
+                chatList1.add(new BulkSMS(row.getString("title"), row.getString("description"),
+                        Utility.convertDateToLocalTimeZoneAndReadable(row.getString("datetime")), -1));
+            }
 
             convList.clear();
 
@@ -221,6 +203,34 @@ public class BulkSMSActivity extends AppCompatActivity
             return v;
         }
 
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        isVisible = true;
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        isVisible = false;
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        isVisible = true;
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        isVisible = false;
+    }
+
+    public void ToastNotify(JSONObject row) {
+        receiveMessage(row);
     }
 
 }
