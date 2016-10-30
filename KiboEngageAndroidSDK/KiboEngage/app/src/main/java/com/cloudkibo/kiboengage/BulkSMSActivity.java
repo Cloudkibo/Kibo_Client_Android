@@ -80,7 +80,6 @@ public class BulkSMSActivity extends AppCompatActivity
 			final MediaPlayer mp = MediaPlayer.create(getApplicationContext(), R.raw.bell);
 			mp.start();
 
-			// todo see if this really needs the uniqueid and status
 			convList.add(new BulkSMS(row.getString("title"), row.getString("description"),
                     Utility.convertDateToLocalTimeZoneAndReadable(row.getString("datetime")), -1));
 

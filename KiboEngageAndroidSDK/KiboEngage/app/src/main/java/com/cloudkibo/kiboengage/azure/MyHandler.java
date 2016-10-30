@@ -53,9 +53,15 @@ public class MyHandler extends NotificationsHandler {
         try{
             payload = new JSONObject(msg);
             payload = payload.getJSONObject("data");
-            if(payload.has("type")){
+            if(payload.has("type")) {
                 if(payload.getString("type").equals("bulksms"))
                     loadBulkSmsFromServer(payload);
+            } else if(payload.has("tablename") && payload.has("operation")) {
+                if(payload.getString("tablename").equals("Channels")){
+                    Utility.handleChannelNotification(ctx, payload);
+                } else {
+                    Utility.handleGroupNotification(ctx, payload);
+                }
             } else {
                 sendNotification(msg);
             }

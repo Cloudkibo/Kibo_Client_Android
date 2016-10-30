@@ -65,7 +65,7 @@ public class Channels extends AppCompatActivity {
 
             ArrayList<ChannelItem> tempChannelList = new ArrayList<ChannelItem>();
 
-            JSONArray chats = db.getMessageChannels(groupid); // todo change to just group id
+            JSONArray chats = db.getMessageChannels(groupid);
 
             for (int i=0; i < chats.length(); i++) {
                 JSONObject row = chats.getJSONObject(i);

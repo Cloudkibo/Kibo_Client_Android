@@ -301,15 +301,18 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         db.close(); // Closing database connection
     }
 
-/*
 
-    public void updateContact(String status, String phone, String id) {
+    /////////////////////////////////////////////////////////////////////
+    // Updating groups detail in database                              //
+    /////////////////////////////////////////////////////////////////////
+
+    public void updateGroup(String id, String deptname, String deptdescription) {
 
         SQLiteDatabase db = this.getWritableDatabase();
 
-        String updateQuery = "UPDATE " + Contacts.TABLE_CONTACTS +
-                " SET "+ Contacts.CONTACT_STATUS +"='"+ status +"', " + Contacts.CONTACT_UID +"='"+ id +"' "+
-                " WHERE "+ Contacts.CONTACT_PHONE +"='"+phone+"'";
+        String updateQuery = "UPDATE GROUPS" +
+                " SET deptname='"+ deptname +"', deptdescription='"+ deptdescription +"' "+
+                " WHERE groupid='"+id+"'";
 
         try {
             db.execSQL(updateQuery);
@@ -319,7 +322,30 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
         db.close();
     }
-*/
+
+
+    /////////////////////////////////////////////////////////////////////
+    // Updating message channel in database                            //
+    /////////////////////////////////////////////////////////////////////
+
+    public void updateMessageChannel(String id, String activeStatus, String groupid, String msg_channel_name,
+                              String msg_channel_description) {
+
+        SQLiteDatabase db = this.getWritableDatabase();
+
+        String updateQuery = "UPDATE MESSAGECHANNELS" +
+                " SET activeStatus='"+ activeStatus +"', groupid='"+ groupid +"', msg_channel_name='"+ msg_channel_name +"', msg_channel_description='"+ msg_channel_description +"' "+
+                " WHERE channelid='"+id+"'";
+
+        try {
+            db.execSQL(updateQuery);
+        } catch (Exception e){
+            e.printStackTrace();
+        }
+
+        db.close();
+    }
+
 
 
     /////////////////////////////////////////////////////////////////////
@@ -700,6 +726,42 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         }
     }
 
+    public void resetSpecificGroup(String uniqueid){
+        SQLiteDatabase db = this.getWritableDatabase();
+
+        String deleteQuery = "DELETE FROM GROUPS WHERE groupid='"+ uniqueid +"'";
+
+        db.execSQL(deleteQuery);
+        db.close();
+    }
+
+    public void resetSpecificMessageChannel(String uniqueid){
+        SQLiteDatabase db = this.getWritableDatabase();
+
+        String deleteQuery = "DELETE FROM MESSAGECHANNELS WHERE channelid='"+ uniqueid +"'";
+
+        db.execSQL(deleteQuery);
+        db.close();
+    }
+
+    public void resetSpecificSessionsOfChannel(String uniqueid){
+        SQLiteDatabase db = this.getWritableDatabase();
+
+        String deleteQuery = "DELETE FROM SESSIONS WHERE msg_channel_id='"+ uniqueid +"'";
+
+        db.execSQL(deleteQuery);
+        db.close();
+    }
+
+    public void resetSpecificChatsOfChannel(String uniqueid){
+        SQLiteDatabase db = this.getWritableDatabase();
+
+        String deleteQuery = "DELETE FROM CHATS WHERE messagechannel='"+ uniqueid +"'";
+
+        db.execSQL(deleteQuery);
+        db.close();
+    }
+
     /*public void resetSpecificChat(String user1, String user2){
         SQLiteDatabase db = this.getWritableDatabase();
 
@@ -717,15 +779,6 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         SQLiteDatabase db = this.getWritableDatabase();
 
         String deleteQuery = "DELETE FROM " + Contacts.TABLE_CONTACTS + " WHERE "+ Contacts.CONTACT_USERNAME + "='"+ user2 +"'";
-
-        db.execSQL(deleteQuery);
-        db.close();
-    }*/
-
-    /*public void resetSpecificChatHistorySync(String uniqueid){
-        SQLiteDatabase db = this.getWritableDatabase();
-
-        String deleteQuery = "DELETE FROM chat_history_sync WHERE uniqueid='"+ uniqueid +"'";
 
         db.execSQL(deleteQuery);
         db.close();

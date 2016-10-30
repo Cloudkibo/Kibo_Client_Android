@@ -9,6 +9,7 @@ import com.cloudkibo.kiboengage.network.UserFunctions;
 
 import org.apache.http.NameValuePair;
 import org.apache.http.message.BasicNameValuePair;
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -85,6 +86,120 @@ public class Utility {
         uniqueid += (new Date().getHours()) + "" + (new Date().getMinutes()) + "" + (new Date().getSeconds());
 
         return uniqueid;
+    }
+
+    public static void handleChannelNotification(Context ctx, JSONObject payload){
+        try{
+            DatabaseHandler db = new DatabaseHandler(ctx);
+            String workType = payload.getString("operation");
+            payload = payload.getJSONObject("obj");
+            if (workType.equals("EditChannel")) {
+                db.updateMessageChannel(payload.getString("_id"), payload.getString("activeStatus"),
+                        payload.getString("groupid"), payload.getString("msg_channel_name"),
+                        payload.getString("msg_channel_description"));
+            } else if (workType.equals("CreateChannel")) {
+                db.addMessageChannel(payload.getString("msg_channel_name"), payload.getString("msg_channel_description"),
+                        payload.getString("companyid"), payload.getString("groupid"), payload.getString("createdby"),
+                        payload.getString("creationdate"), payload.getString("activeStatus"), payload.getString("_id"));
+                db = new DatabaseHandler(ctx);
+                HashMap<String, String> userDetail = db.getUserDetails();
+                createSessions(ctx, userDetail.get("customerId"), payload.getString("companyid"), payload.getString("groupid"),
+                        payload.getString("_id"), userDetail.get("appId"), userDetail.get("clientId"),
+                        userDetail.get("appSecret"));
+            } else {
+                db.resetSpecificChatsOfChannel(payload.getString("_id"));
+                db = new DatabaseHandler(ctx);
+                db.resetSpecificSessionsOfChannel(payload.getString("_id"));
+                db = new DatabaseHandler(ctx);
+                db.resetSpecificMessageChannel(payload.getString("_id"));
+            }
+        } catch (JSONException e){
+            e.printStackTrace();
+        }
+    }
+
+    public static void handleGroupNotification(Context ctx, JSONObject payload){
+        try{
+            DatabaseHandler db = new DatabaseHandler(ctx);
+            String workType = payload.getString("operation");
+            payload = payload.getJSONObject("obj");
+            if (workType.equals("EditTeam")) {
+                db.updateGroup(payload.getString("_id"), payload.getString("deptname"), payload.getString("deptdescription"));
+            } else if (workType.equals("CreateTeam")) {
+                db.addGroup(payload.getString("deptname"), payload.getString("deptdescription"),
+                        payload.getString("companyid"), payload.getString("createdby"),
+                        payload.getString("creationdate"), payload.getString("deleteStatus"), payload.getString("_id"));
+            } else {
+                JSONArray channels = db.getMessageChannels(payload.getString("_id"));
+                db = new DatabaseHandler(ctx);
+                for(int i=0; i<channels.length(); i++){
+                    JSONObject channel = channels.getJSONObject(i);
+                    db.resetSpecificChatsOfChannel(channel.getString("channelid"));
+                    db = new DatabaseHandler(ctx);
+                    db.resetSpecificSessionsOfChannel(channel.getString("channelid"));
+                    db = new DatabaseHandler(ctx);
+                    db.resetSpecificMessageChannel(channel.getString("channelid"));
+                }
+                db = new DatabaseHandler(ctx);
+                db.resetSpecificGroup(payload.getString("_id"));
+            }
+        } catch (JSONException e){
+            e.printStackTrace();
+        }
+    }
+
+    private static void createSessions(final Context appContext, final String customerId, final String companyId,
+                                       final String groupId, final String channelId, final String appId,
+                                       final String clientId, final String appSecret){
+
+        new AsyncTask<String, String, JSONObject>() {
+
+            @Override
+            protected JSONObject doInBackground(String... args) {
+
+                JSONObject jParams = new JSONObject();
+
+                JSONArray sessionInfo = new JSONArray();
+                try {
+                    jParams.put("customerID", customerId);
+                    jParams.put("companyid", companyId);
+                    jParams.put("platform", "mobile");
+                    jParams.put("isMobile", "true");
+                    jParams.put("status", "new");
+
+                    String uniqueid = Utility.generateUniqueId();
+
+                    JSONObject sessionObj = new JSONObject();
+                    sessionObj.put("departmentid", groupId);
+                    sessionObj.put("messagechannel", channelId);
+                    sessionObj.put("request_id", uniqueid);
+
+                    sessionInfo.put(sessionObj);
+
+                    DatabaseHandler db = new DatabaseHandler(appContext);
+                    int count = db.getRowCountForSpecificSessions(groupId, channelId);
+                    if(count < 1) {
+                        db = new DatabaseHandler(appContext);
+                        db.addSession(groupId, channelId,
+                                uniqueid, "", "", "", Utility.getCurrentTimeInISO());
+                    }
+
+                    jParams.put("sessionInfo", sessionInfo);
+                }catch (JSONException e){
+                    e.printStackTrace();
+                }
+                UserFunctions userFunction = new UserFunctions();
+                JSONObject json = userFunction.createSession(jParams, appId, clientId, appSecret);
+                return json;
+            }
+
+            @Override
+            protected void onPostExecute(JSONObject jsonA) {
+                Log.d("KIBO_ENGAGE", "Create Sessions: "+ jsonA.toString());
+            }
+
+        }.execute();
+
     }
 
 }

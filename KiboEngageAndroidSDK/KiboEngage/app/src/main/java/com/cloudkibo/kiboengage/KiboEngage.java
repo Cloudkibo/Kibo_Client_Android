@@ -17,6 +17,7 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 
 /**
@@ -87,6 +88,17 @@ public class KiboEngage {
         db = new DatabaseHandler(context);
         Log.d("KIBO_ENGAGE", "Registered App with ID: "+ db.getUserDetails().get("appId"));
     }
+
+    /*public static void startSync(Context ctx) {
+        DatabaseHandler db = new DatabaseHandler(ctx);
+        HashMap<String, String> user = db.getUserDetails();
+        appContext = ctx;
+        appId = user.get("appId");
+        clientId = user.get("clientId");
+        appSecret = user.get("appSecret");
+        customerId = user.get("customerId");
+        loadGroups();
+    }*/
 
     private static void loadGroups(){
 
