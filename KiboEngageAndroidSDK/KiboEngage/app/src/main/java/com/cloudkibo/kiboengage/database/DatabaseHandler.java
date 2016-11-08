@@ -347,6 +347,24 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     }
 
 
+    /////////////////////////////////////////////////////////////////////
+    // Updating chat message status in database                        //
+    /////////////////////////////////////////////////////////////////////
+
+    public void updateChat(String status, String uniqueid) {
+
+        SQLiteDatabase db = this.getWritableDatabase();
+
+        String updateQuery = "UPDATE CHATS SET status='"+ status +"' WHERE uniqueid='"+uniqueid+"'";
+
+        try {
+            db.execSQL(updateQuery);
+        } catch (Exception e){
+            e.printStackTrace();
+        }
+
+        db.close();
+    }
 
     /////////////////////////////////////////////////////////////////////
     // Getting user data from database                                 //
@@ -566,6 +584,31 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         return sessions;
     }
 
+    public JSONObject getSession(String groupid, String channelid) throws JSONException {
+        JSONObject session = new JSONObject();
+        String selectQuery = "SELECT  * FROM SESSIONS WHERE group_id='"+ groupid +"' AND msg_channel_id='"+ channelid +"'";
+
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor cursor = db.rawQuery(selectQuery, null);
+        // Move to first row
+        cursor.moveToFirst();
+        if(cursor.getCount() > 0){
+
+            session.put("group_id", cursor.getString(1));
+            session.put("msg_channel_id", cursor.getString(2));
+            session.put("request_id", cursor.getString(3));
+            session.put("agent_email", cursor.getString(4));
+            session.put("agent_id", cursor.getString(5));
+            session.put("agent_name", cursor.getString(6));
+            session.put("datetime", cursor.getString(7));
+
+            cursor.moveToNext();
+        }
+        cursor.close();
+        db.close();
+        // return user
+        return session;
+    }
 
     /////////////////////////////////////////////////////////////////////
     // Getting bulk sms data from database                             //

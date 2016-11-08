@@ -51,7 +51,11 @@ public class Channels extends AppCompatActivity {
             public void onItemClick(AdapterView<?> arg0, View arg1, int pos,
                                     long arg3)
             {
-                startActivity(new Intent(getApplicationContext(), GroupChat.class));
+                Intent i = new Intent(getApplicationContext(), GroupChat.class);
+                i.putExtra("groupid", channelList.get(pos).getGroupId());
+                i.putExtra("channelid", channelList.get(pos).getChannelId());
+                i.putExtra("msg_channel_name", channelList.get(pos).getName());
+                startActivity(i);
             }
         });
         adp.notifyDataSetChanged();
@@ -71,7 +75,14 @@ public class Channels extends AppCompatActivity {
                 JSONObject row = chats.getJSONObject(i);
 
                 tempChannelList.add(new ChannelItem(
-                        row.getString("msg_channel_name")
+                        row.getString("msg_channel_name"),
+                        row.getString("msg_channel_description"),
+                        row.getString("companyid"),
+                        row.getString("groupid"),
+                        row.getString("createdby"),
+                        row.getString("creationdate"),
+                        row.getString("activeStatus"),
+                        row.getString("channelid")
                 ));
 
             }

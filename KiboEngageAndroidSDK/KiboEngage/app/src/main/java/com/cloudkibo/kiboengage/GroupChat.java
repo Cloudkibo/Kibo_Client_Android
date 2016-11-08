@@ -1,7 +1,6 @@
 package com.cloudkibo.kiboengage;
 
 import android.content.Context;
-import android.media.MediaPlayer;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
@@ -21,6 +20,8 @@ import com.cloudkibo.kiboengage.library.Utility;
 import com.cloudkibo.kiboengage.model.Conversation;
 import com.cloudkibo.kiboengage.network.UserFunctions;
 
+import org.apache.http.NameValuePair;
+import org.apache.http.message.BasicNameValuePair;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -29,6 +30,7 @@ import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 
 
 /**
@@ -48,13 +50,13 @@ public class GroupChat extends AppCompatActivity
 
 	/** The Editext to compose the message. */
 	private EditText txt;
-	
-	private String authtoken;
 
 	private HashMap<String, String> user;
 	
-	String contactName;
-	String contactPhone;
+	private String groupId;
+	private String channelId;
+	private String channelName;
+	private JSONObject session;
 
 	/* (non-Javadoc)
 	 * @see android.support.v4.app.Fragment#onCreateView(android.view.LayoutInflater, android.view.ViewGroup, android.os.Bundle)
@@ -64,16 +66,19 @@ public class GroupChat extends AppCompatActivity
 	{
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.kiboengage_sdk_group_chat);
-		
-		/*contactName = this.getArguments().getString("contactusername");
 
-		contactPhone = this.getArguments().getString("contactphone");
+		groupId = getIntent().getExtras().getString("groupid");
+		channelId = getIntent().getExtras().getString("channelid");
+		channelName = getIntent().getExtras().getString("msg_channel_name");
 
-		authtoken = this.getArguments().getString("authtoken");*/
-
-		/*DatabaseHandler db = new DatabaseHandler(getActivity().getApplicationContext());
-
-		user = db.getUserDetails();*/
+		DatabaseHandler db = new DatabaseHandler(getApplicationContext());
+		user = db.getUserDetails();
+		try {
+			db = new DatabaseHandler(getApplicationContext());
+			session = db.getSession(groupId, channelId);
+		} catch (JSONException e){
+			e.printStackTrace();
+		}
 
 		loadConversationList();
 		
@@ -116,7 +121,7 @@ public class GroupChat extends AppCompatActivity
 	 */
 	private void sendMessage()
 	{
-		/*try {
+		try {
 			if (txt.length() == 0)
 				return;
 
@@ -127,22 +132,31 @@ public class GroupChat extends AppCompatActivity
 
 			String messageString = txt.getText().toString();
 
-			// todo deprecated remove this way
-			//act1.sendMessage(contactPhone, messageString, uniqueid);
-
 			DatabaseHandler db = new DatabaseHandler(getApplicationContext());
-			db.addChat(contactPhone, user.get("phone"), user.get("display_name"),
-					messageString, Utility.getCurrentTimeInISO(), "pending", uniqueid);
+			if(session.getString("agent_email").equals("")) {
+				// todo add more customer information
+				db.addChat("All Agents", user.get("customerId"), uniqueid, "", "", "", "no", "message", "pending", messageString,
+						session.getString("request_id"), channelId, user.get("clientId"), Utility.convertDateToLocalTimeZoneAndReadable(Utility.getCurrentTimeInISO()));
+			} else {
+				db.addChat(session.getString("agent_name"), user.get("customerId"), uniqueid, "", session.getString("agent_email"), session.getString("agent_id"), "no", "message", "pending", messageString,
+						session.getString("request_id"), channelId, user.get("clientId"), Utility.convertDateToLocalTimeZoneAndReadable(Utility.getCurrentTimeInISO()));
+			}
 
-			convList.add(new Conversation(messageString, Utility.convertDateToLocalTimeZoneAndReadable(Utility.getCurrentTimeInISO()), true, true, "pending", uniqueid));
+			//convList.add(new Conversation(messageString, Utility.convertDateToLocalTimeZoneAndReadable(Utility.getCurrentTimeInISO()), true, true, "pending", uniqueid));
+			convList.add(new Conversation(
+					messageString,
+					Utility.convertDateToLocalTimeZoneAndReadable(Utility.getCurrentTimeInISO()),
+					true, true, "pending", uniqueid, "message"));
 			adp.notifyDataSetChanged();
 
-			sendMessageUsingAPI(messageString, uniqueid);
+			saveMessageUsingAPI(messageString, uniqueid);
 
 			txt.setText(null);
 		} catch (ParseException e){
 			e.printStackTrace();
-		}*/
+		} catch (JSONException e){
+			e.printStackTrace();
+		}
 	}
 	
 	public void receiveMessage(String msg, String uniqueid, String from, String date) {
@@ -164,28 +178,54 @@ public class GroupChat extends AppCompatActivity
 		
 	}
 
-	public void sendMessageUsingAPI(final String msg, final String uniqueid){
-		/*new AsyncTask<String, String, JSONObject>() {
+	public void saveMessageUsingAPI(final String msg, final String uniqueid){
+		new AsyncTask<String, String, JSONObject>() {
 
 			@Override
 			protected JSONObject doInBackground(String... args) {
 				UserFunctions userFunction = new UserFunctions();
-				JSONObject message = new JSONObject();
+				List<NameValuePair> params = new ArrayList<NameValuePair>();
 
 				try {
-					message.put("from", user.get("phone"));
-					message.put("to", contactPhone);
-					message.put("fromFullName", user.get("display_name"));
-					message.put("msg", msg);
-					message.put("date", Utility.getCurrentTimeInISO());
-					message.put("uniqueid", uniqueid);
-					message.put("type", "chat");
-					message.put("file_type", "");
+					// todo add more customer information
+					if(session.getString("agent_email").equals("")) {
+						params.add(new BasicNameValuePair("from", user.get("customerId")));
+						params.add(new BasicNameValuePair("to", "All Agents"));
+						params.add(new BasicNameValuePair("visitoremail", ""));
+						params.add(new BasicNameValuePair("msg", msg));
+						params.add(new BasicNameValuePair("uniqueid", uniqueid));
+						params.add(new BasicNameValuePair("type", "message"));
+						params.add(new BasicNameValuePair("datetime", Utility.getCurrentTimeInISO()));
+						params.add(new BasicNameValuePair("request_id", session.getString("request_id")));
+						params.add(new BasicNameValuePair("messagechannel", channelId));
+						params.add(new BasicNameValuePair("companyid", user.get("clientId")));
+						params.add(new BasicNameValuePair("is_seen", "no"));
+						params.add(new BasicNameValuePair("time", (new Date().getHours()) + "," + (new Date().getMinutes())));
+						params.add(new BasicNameValuePair("fromMobile", "yes"));
+					} else {
+						params.add(new BasicNameValuePair("from", user.get("customerId")));
+						params.add(new BasicNameValuePair("to", session.getString("agent_name")));
+						params.add(new BasicNameValuePair("visitoremail", ""));
+						params.add(new BasicNameValuePair("agentemail", session.getString("agent_email")));
+						params.add(new BasicNameValuePair("toagent", session.getString("agent_email")));
+						params.add(new BasicNameValuePair("agentid", session.getString("agent_id")));
+						params.add(new BasicNameValuePair("msg", msg));
+						params.add(new BasicNameValuePair("uniqueid", uniqueid));
+						params.add(new BasicNameValuePair("type", "message"));
+						params.add(new BasicNameValuePair("datetime", Utility.getCurrentTimeInISO()));
+						params.add(new BasicNameValuePair("request_id", session.getString("request_id")));
+						params.add(new BasicNameValuePair("messagechannel", channelId));
+						params.add(new BasicNameValuePair("companyid", user.get("clientId")));
+						params.add(new BasicNameValuePair("is_seen", "no"));
+						params.add(new BasicNameValuePair("socketid", "no socket id given, we dont use socket"));
+						params.add(new BasicNameValuePair("time", (new Date().getHours()) + "," + (new Date().getMinutes())));
+						params.add(new BasicNameValuePair("fromMobile", "yes"));
+					}
 				} catch (JSONException e){
 					e.printStackTrace();
 				}
 
-				return userFunction.sendChatMessageToServer(message, authtoken);
+				return userFunction.saveChat(params, user.get("appId"), user.get("clientId"), user.get("appSecret`"));
 			}
 
 			@Override
@@ -194,18 +234,77 @@ public class GroupChat extends AppCompatActivity
 
 					if (row != null) {
 						if(row.has("status")){
-							MainActivity act1 = (MainActivity) getActivity();
-							act1.updateChatStatus(row.getString("status"), row.getString("uniqueid"));
+							DatabaseHandler db = new DatabaseHandler(getApplicationContext());
+							db.updateChat(row.getString("status"), row.getString("uniqueid"));
 							updateStatusSentMessage(row.getString("status"), row.getString("uniqueid"));
 						}
 					}
+					sendMessageUsingAPI(msg, uniqueid);
 
 				} catch (JSONException e) {
 					e.printStackTrace();
 				}
 			}
 
-		}.execute();*/
+		}.execute();
+	}
+
+	public void sendMessageUsingAPI(final String msg, final String uniqueid){
+		new AsyncTask<String, String, JSONObject>() {
+
+			@Override
+			protected JSONObject doInBackground(String... args) {
+				UserFunctions userFunction = new UserFunctions();
+				List<NameValuePair> params = new ArrayList<NameValuePair>();
+
+				try {
+					// todo add more customer information
+					if(session.getString("agent_email").equals("")) {
+						params.add(new BasicNameValuePair("from", user.get("customerId")));
+						params.add(new BasicNameValuePair("to", "All Agents"));
+						params.add(new BasicNameValuePair("visitoremail", ""));
+						params.add(new BasicNameValuePair("msg", msg));
+						params.add(new BasicNameValuePair("uniqueid", uniqueid));
+						params.add(new BasicNameValuePair("type", "message"));
+						params.add(new BasicNameValuePair("datetime", Utility.getCurrentTimeInISO()));
+						params.add(new BasicNameValuePair("request_id", session.getString("request_id")));
+						params.add(new BasicNameValuePair("messagechannel", channelId));
+						params.add(new BasicNameValuePair("companyid", user.get("clientId")));
+						params.add(new BasicNameValuePair("is_seen", "no"));
+						params.add(new BasicNameValuePair("time", (new Date().getHours()) + "," + (new Date().getMinutes())));
+						params.add(new BasicNameValuePair("fromMobile", "yes"));
+					} else {
+						params.add(new BasicNameValuePair("from", user.get("customerId")));
+						params.add(new BasicNameValuePair("to", session.getString("agent_name")));
+						params.add(new BasicNameValuePair("visitoremail", ""));
+						params.add(new BasicNameValuePair("agentemail", session.getString("agent_email")));
+						params.add(new BasicNameValuePair("toagent", session.getString("agent_email")));
+						params.add(new BasicNameValuePair("agentid", session.getString("agent_id")));
+						params.add(new BasicNameValuePair("msg", msg));
+						params.add(new BasicNameValuePair("uniqueid", uniqueid));
+						params.add(new BasicNameValuePair("type", "message"));
+						params.add(new BasicNameValuePair("datetime", Utility.getCurrentTimeInISO()));
+						params.add(new BasicNameValuePair("request_id", session.getString("request_id")));
+						params.add(new BasicNameValuePair("messagechannel", channelId));
+						params.add(new BasicNameValuePair("companyid", user.get("clientId")));
+						params.add(new BasicNameValuePair("is_seen", "no"));
+						params.add(new BasicNameValuePair("socketid", "no socket id given, we dont use socket"));
+						params.add(new BasicNameValuePair("time", (new Date().getHours()) + "," + (new Date().getMinutes())));
+						params.add(new BasicNameValuePair("fromMobile", "yes"));
+					}
+				} catch (JSONException e){
+					e.printStackTrace();
+				}
+
+				return userFunction.sendChat(params, user.get("appId"), user.get("clientId"), user.get("appSecret`"));
+			}
+
+			@Override
+			protected void onPostExecute(JSONObject row) {
+
+			}
+
+		}.execute();
 	}
 
 	public void sendMessageStatusUsingAPI(final String status, final String uniqueid, final String sender){
@@ -255,7 +354,12 @@ public class GroupChat extends AppCompatActivity
 	}
 
 	public void updateStatusSentMessage(String status, String uniqueid){
-		loadConversationList();
+		for(int i=0; i<convList.size(); i++){
+			if(convList.get(i).getUniqueid().equals(uniqueid)){
+				convList.get(i).setStatus(status);
+				break;
+			}
+		}
 		adp.notifyDataSetChanged();
 	}
 	
@@ -278,50 +382,31 @@ public class GroupChat extends AppCompatActivity
 		
 		try {
 
-			//JSONArray jsonA = db.getChat(act1.getUserPhone(), contactPhone);
+			JSONArray jsonA = db.getChat(session.getString("request_id"));
 
 			ArrayList<Conversation> chatList1 = new ArrayList<Conversation>();
 
-			chatList1.add(new Conversation(
-					"Hello, how are you?",
-					Utility.convertDateToLocalTimeZoneAndReadable(Utility.getCurrentTimeInISO()),
-					true, true, "seen", "asfw5fasd", "message"));
-
-			chatList1.add(new Conversation(
-					"Hello, I am fine",
-					Utility.convertDateToLocalTimeZoneAndReadable(Utility.getCurrentTimeInISO()),
-					false, true, "seen", "asfw5fasd", "message"));
-
-			chatList1.add(new Conversation(
-					"This chat has been assigned to Sojharo",
-					Utility.convertDateToLocalTimeZoneAndReadable(Utility.getCurrentTimeInISO()),
-					true, true, "seen", "asfw5fasd", "log"));
-
-			chatList1.add(new Conversation(
-					"Hello, how are you?",
-					Utility.convertDateToLocalTimeZoneAndReadable(Utility.getCurrentTimeInISO()),
-					true, true, "seen", "asfw5fasd", "message"));
-
-			/*for (int i=0; i < jsonA.length(); i++) {
+			for (int i=0; i < jsonA.length(); i++) {
 				JSONObject row = jsonA.getJSONObject(i);
 				
-				if(row.getString("toperson").equals(contactPhone))
+				if(row.getString("from").equals(user.get("customerId")))
 					chatList1.add(new Conversation(
-						row.getString("msg"),
-						Utility.convertDateToLocalTimeZoneAndReadable(row.getString("date")),
-						true, true, row.getString("status"), row.getString("uniqueid")));
+							row.getString("msg"),
+							Utility.convertDateToLocalTimeZoneAndReadable(row.getString("datetime")),
+							true, true, row.getString("status"), row.getString("uniqueid"), row.getString("type")));
 				else
 					chatList1.add(new Conversation(
 							row.getString("msg"),
-							Utility.convertDateToLocalTimeZoneAndReadable(row.getString("date")),
-							false, true, row.getString("status"), row.getString("uniqueid")));
+							Utility.convertDateToLocalTimeZoneAndReadable(row.getString("datetime")),
+							false, true, row.getString("status"), row.getString("uniqueid"), row.getString("type")));
 
-				if(row.getString("fromperson").equals(contactPhone)){
+				// todo
+				/*if(row.getString("fromperson").equals(contactPhone)){
 					if(row.getString("status").equals("delivered")){
 						sendMessageStatusUsingAPI("seen", row.getString("uniqueid"), row.getString("fromperson"));
 					}
-				}
-			}*/
+				}*/
+			}
 			
 			convList.clear();
 

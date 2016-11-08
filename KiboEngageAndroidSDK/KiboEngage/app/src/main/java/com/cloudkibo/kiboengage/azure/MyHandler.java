@@ -62,6 +62,8 @@ public class MyHandler extends NotificationsHandler {
                 } else {
                     Utility.handleGroupNotification(ctx, payload);
                 }
+            } else if(payload.has("uniqueid") && payload.has("request_id")) {
+                Utility.fetchChatMessage(ctx, payload);
             } else {
                 sendNotification(msg);
             }

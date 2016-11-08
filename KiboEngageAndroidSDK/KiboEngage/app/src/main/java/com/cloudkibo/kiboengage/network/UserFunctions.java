@@ -12,9 +12,6 @@ import java.util.List;
 
 
 import org.apache.http.NameValuePair;
-import org.apache.http.message.BasicNameValuePair;
-
-
 
 
 public class UserFunctions {
@@ -33,14 +30,16 @@ public class UserFunctions {
     private static String createSessionsURL =       baseURL + "/api/visitorcalls/createbulksession/";
     private static String getSessionsURL =          baseURL + "/api/visitorcalls/getcustomersessions";
     private static String getBulkSMSURL =           baseURL + "/api/notifications/fetchbulksms";
-    private static String getBulkSMSListURL =           baseURL + "/api/notifications/";
+    private static String getBulkSMSListURL =       baseURL + "/api/notifications/";
+    private static String saveChatURL =             baseURL + "/api/userchats/create";
+    private static String sendChatURL =             "http://kiboengage.cloudapp.net/api/getchat";
+    private static String fetchChatURL =            baseURL + "/api/userchats/fetchChat";
 
 
     //URL of the NODEJS API
     private static String loginURL =                baseURL + "/auth/local";
     private static String registerURL =             baseURL + "/api/users/";
     private static String userDataURL =             baseURL + "/api/users/me";
-    private static String saveChatURL =             baseURL + "/api/userchat/save";
     private static String getChatURL =              baseURL + "/api/userchat";
     private static String markChatReadURL =         baseURL + "/api/userchat/markasread";
     private static String saveContactURL =          baseURL + "/api/contactslist/addbyusername";
@@ -57,7 +56,6 @@ public class UserFunctions {
     private static String inviteContactsURL =       baseURL + "/api/users/invitebymultipleemail/";
     private static String saveDisplayNameURL =      baseURL + "/api/users/newuser";
     private static String getAllChatURL =           baseURL + "/api/userchat/alluserchat";
-    private static String sendChatURL =             baseURL + "/api/userchat/save2";
     private static String sendChatStatusURL =             baseURL + "/api/userchat/updateStatus";
     private static String getPartialChatURL =       baseURL + "/api/userchat/partialchatsync";
     private static String getSingleChatURL =        baseURL + "/api/userchat/getsinglechat";
@@ -118,6 +116,21 @@ public class UserFunctions {
         return userchatresponse;
     }
 
+    public JSONObject saveChat(List<NameValuePair> params, String appId, String clientId, String appSecret) {
+        JSONObject userchatresponse = connection.sendObjectToServer(saveChatURL, appId, clientId, appSecret, params);
+        return userchatresponse;
+    }
+
+    public JSONObject sendChat(List<NameValuePair> params, String appId, String clientId, String appSecret) {
+        JSONObject userchatresponse = connection.sendObjectToServer(sendChatURL, appId, clientId, appSecret, params);
+        return userchatresponse;
+    }
+
+    public JSONObject fetchChat(List<NameValuePair> params, String appId, String clientId, String appSecret) {
+        JSONObject userchatresponse = connection.sendObjectToServer(fetchChatURL, appId, clientId, appSecret, params);
+        return userchatresponse;
+    }
+
     /*public JSONObject sendChatMessageToServer(JSONObject data, String appId, String clientId, String appSecret) {
         List<NameValuePair> params = new ArrayList<NameValuePair>();
         try{
@@ -132,7 +145,7 @@ public class UserFunctions {
         } catch (JSONException e){
             e.printStackTrace();
         }
-        JSONObject response = connection.sendObjectToServer(sendChatURL, appId, clientId, appSecret, params);
+        JSONObject response = connection.sendObjectToServer(saveChatURL, appId, clientId, appSecret, params);
         return response;
     }*/
 

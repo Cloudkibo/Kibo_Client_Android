@@ -202,4 +202,35 @@ public class Utility {
 
     }
 
+    public static void fetchChatMessage(final Context appContext, final JSONObject payload){
+
+        new AsyncTask<String, String, JSONObject>() {
+
+            @Override
+            protected JSONObject doInBackground(String... args) {
+
+                UserFunctions userFunction = new UserFunctions();
+                List<NameValuePair> params = new ArrayList<NameValuePair>();
+
+                try {
+                    params.add(new BasicNameValuePair("uniqueid", payload.getString("uniqueid")));
+                    params.add(new BasicNameValuePair("request_id", "request_id"));
+                } catch (JSONException e){
+                    e.printStackTrace();
+                }
+
+                DatabaseHandler db = new DatabaseHandler(appContext);
+                HashMap<String, String> user = db.getUserDetails();
+                return userFunction.fetchChat(params, user.get("appId"), user.get("clientId"), user.get("appSecret`"));
+            }
+
+            @Override
+            protected void onPostExecute(JSONObject jsonA) {
+                Log.d("KIBO_ENGAGE", "Create Sessions: "+ jsonA.toString());
+            }
+
+        }.execute();
+
+    }
+
 }
