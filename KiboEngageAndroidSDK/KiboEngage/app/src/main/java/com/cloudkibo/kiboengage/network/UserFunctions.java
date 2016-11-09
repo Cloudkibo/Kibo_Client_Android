@@ -126,8 +126,8 @@ public class UserFunctions {
         return userchatresponse;
     }
 
-    public JSONObject fetchChat(List<NameValuePair> params, String appId, String clientId, String appSecret) {
-        JSONObject userchatresponse = connection.sendObjectToServer(fetchChatURL, appId, clientId, appSecret, params);
+    public JSONArray fetchChat(List<NameValuePair> params, String appId, String clientId, String appSecret) {
+        JSONArray userchatresponse = connection.sendArrayToServer(fetchChatURL, appId, clientId, appSecret, params);
         return userchatresponse;
     }
 

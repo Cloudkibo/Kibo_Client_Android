@@ -2,6 +2,7 @@ package com.cloudkibo.kiboengage.library;
 
 import android.content.Context;
 import android.os.AsyncTask;
+import android.provider.ContactsContract;
 import android.util.Log;
 
 import com.cloudkibo.kiboengage.database.DatabaseHandler;
@@ -204,10 +205,10 @@ public class Utility {
 
     public static void fetchChatMessage(final Context appContext, final JSONObject payload){
 
-        new AsyncTask<String, String, JSONObject>() {
+        new AsyncTask<String, String, JSONArray>() {
 
             @Override
-            protected JSONObject doInBackground(String... args) {
+            protected JSONArray doInBackground(String... args) {
 
                 UserFunctions userFunction = new UserFunctions();
                 List<NameValuePair> params = new ArrayList<NameValuePair>();
@@ -225,8 +226,21 @@ public class Utility {
             }
 
             @Override
-            protected void onPostExecute(JSONObject jsonA) {
-                Log.d("KIBO_ENGAGE", "Create Sessions: "+ jsonA.toString());
+            protected void onPostExecute(JSONArray jsonA) {
+                Log.d("KIBO_ENGAGE", "Fetch Chat: "+ jsonA.toString());
+                try {
+                    JSONObject row = jsonA.getJSONObject(0);
+                    DatabaseHandler db = new DatabaseHandler(appContext);
+                    String agentemail = row.getJSONArray("agentemail").getString(row.getJSONArray("agentemail").length()-1);
+                    String agentid = row.getJSONArray("agentid").getString(row.getJSONArray("agentid").length()-1);
+                    db.addChat(row.getString("to"), row.getString("from"), row.getString("uniqueid"),
+                            row.getString("visitoremail"), agentemail, agentid, row.getString("is_seen"),
+                            row.getString("type"), row.getString("status"), row.getString("msg"),
+                            row.getString("request_id"), row.getString("messagechannel"), row.getString("companyid"),
+                            row.getString("datetime"));
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
             }
 
         }.execute();
