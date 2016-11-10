@@ -64,9 +64,11 @@ public class MyHandler extends NotificationsHandler {
                 }
             } else if(payload.has("uniqueid") && payload.has("request_id")) {
                 Utility.fetchChatMessage(ctx, payload);
-            } else {
+            //} else if(payload.has("agentname") && payload.has("agentemail") && payload.has("agentid")) {
+            //    Utility.handleSessionAssignment(ctx, payload);
+            }// else {
                 sendNotification(msg);
-            }
+            //}
         }catch(JSONException e){
             e.printStackTrace();
         }

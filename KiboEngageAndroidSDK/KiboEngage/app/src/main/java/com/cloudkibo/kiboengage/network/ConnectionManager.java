@@ -93,7 +93,7 @@ public class ConnectionManager {
             }
             is.close();
             json = sb.toString();
-            //Log.d("JSON", json);
+            Log.d("JSON", json);
         } catch (Exception e) {
             Log.d("Buffer Error", "Error converting result " + e.toString());
         }
@@ -152,7 +152,7 @@ public class ConnectionManager {
             }
             is.close();
             json = sb.toString();
-            //Log.d("JSON", json);
+            Log.d("JSON", json);
         } catch (Exception e) {
             Log.d("Buffer Error", "Error converting result " + e.toString());
         }
@@ -213,7 +213,7 @@ public class ConnectionManager {
             }
             is.close();
             json = sb.toString();
-            //Log.d("JSON", json);
+            Log.d("JSON", json);
         } catch (Exception e) {
             Log.d("Buffer Error", "Error converting result " + e.toString());
         }
@@ -278,7 +278,7 @@ public class ConnectionManager {
             }
             is.close();
             json = sb.toString();
-            //Log.d("JSON", json);
+            Log.d("JSON", json);
         } catch (Exception e) {
             Log.d("Buffer Error", "Error converting result " + e.toString());
         }
@@ -344,7 +344,7 @@ public class ConnectionManager {
             }
             is.close();
             json = sb.toString();
-            //Log.d("JSON", json);
+            Log.d("JSON", json);
         } catch (Exception e) {
             Log.d("Buffer Error", "Error converting result " + e.toString());
         }
@@ -405,7 +405,7 @@ public class ConnectionManager {
             }
             is.close();
             json = sb.toString();
-            //Log.d("JSON", json);
+            Log.d("JSON", json);
         } catch (Exception e) {
             Log.d("Buffer Error", "Error converting result " + e.toString());
         }

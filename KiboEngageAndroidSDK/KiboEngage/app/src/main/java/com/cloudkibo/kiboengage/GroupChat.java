@@ -5,12 +5,14 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.text.InputType;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.AbsListView;
 import android.widget.BaseAdapter;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -58,6 +60,8 @@ public class GroupChat extends AppCompatActivity
 	private String channelName;
 	private JSONObject session;
 
+	private Button sendBtn;
+
 	/* (non-Javadoc)
 	 * @see android.support.v4.app.Fragment#onCreateView(android.view.LayoutInflater, android.view.ViewGroup, android.os.Bundle)
 	 */
@@ -93,26 +97,15 @@ public class GroupChat extends AppCompatActivity
 		txt.setInputType(InputType.TYPE_CLASS_TEXT
 				| InputType.TYPE_TEXT_FLAG_MULTI_LINE);
 
+		sendBtn = (Button) findViewById(R.id.btnSend);
+		sendBtn.setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View view) {
+				sendMessage();
+			}
+		});
+
 	}
-
-	/* (non-Javadoc)
-	 * @see com.socialshare.custom.CustomFragment#onClick(android.view.View)
-	 */
-	//@Override
-	/*public void onClick(View v)
-	{
-		super.onClick(v);
-		if (v.getId() == R.id.btnSend)
-		{
-			sendMessage();
-		} else if (v.getId() == R.id.btnCamera) {
-			MainActivity act1 = (MainActivity)getActivity();
-
-			act1.callThisPerson(contactPhone,
-					 contactName);
-		}
-
-	}*/
 
 	/**
 	 * Call this method to Send message to opponent. The current implementation
@@ -136,10 +129,10 @@ public class GroupChat extends AppCompatActivity
 			if(session.getString("agent_email").equals("")) {
 				// todo add more customer information
 				db.addChat("All Agents", user.get("customerId"), uniqueid, "", "", "", "no", "message", "pending", messageString,
-						session.getString("request_id"), channelId, user.get("clientId"), Utility.convertDateToLocalTimeZoneAndReadable(Utility.getCurrentTimeInISO()));
+						session.getString("request_id"), channelId, user.get("clientId"), Utility.getCurrentTimeInISO());
 			} else {
 				db.addChat(session.getString("agent_name"), user.get("customerId"), uniqueid, "", session.getString("agent_email"), session.getString("agent_id"), "no", "message", "pending", messageString,
-						session.getString("request_id"), channelId, user.get("clientId"), Utility.convertDateToLocalTimeZoneAndReadable(Utility.getCurrentTimeInISO()));
+						session.getString("request_id"), channelId, user.get("clientId"), Utility.getCurrentTimeInISO());
 			}
 
 			//convList.add(new Conversation(messageString, Utility.convertDateToLocalTimeZoneAndReadable(Utility.getCurrentTimeInISO()), true, true, "pending", uniqueid));
@@ -224,14 +217,16 @@ public class GroupChat extends AppCompatActivity
 				} catch (JSONException e){
 					e.printStackTrace();
 				}
+				Log.d("GroupChat Widget", "Sending params to save chat "+ params.toString());
 
-				return userFunction.saveChat(params, user.get("appId"), user.get("clientId"), user.get("appSecret`"));
+				return userFunction.saveChat(params, user.get("appId"), user.get("clientId"), user.get("appSecret"));
 			}
 
 			@Override
 			protected void onPostExecute(JSONObject row) {
 				try {
 
+					Log.d("GroupChat Widget", "Got response to save chat "+ row.toString());
 					if (row != null) {
 						if(row.has("status")){
 							DatabaseHandler db = new DatabaseHandler(getApplicationContext());
@@ -295,13 +290,14 @@ public class GroupChat extends AppCompatActivity
 				} catch (JSONException e){
 					e.printStackTrace();
 				}
+				Log.d("GroupChat Widget", "Sending params to send chat "+ params.toString());
 
-				return userFunction.sendChat(params, user.get("appId"), user.get("clientId"), user.get("appSecret`"));
+				return userFunction.sendChat(params, user.get("appId"), user.get("clientId"), user.get("appSecret"));
 			}
 
 			@Override
 			protected void onPostExecute(JSONObject row) {
-
+				Log.d("GroupChat Widget", "Got response to send chat "+ row.toString());
 			}
 
 		}.execute();
@@ -389,7 +385,7 @@ public class GroupChat extends AppCompatActivity
 			for (int i=0; i < jsonA.length(); i++) {
 				JSONObject row = jsonA.getJSONObject(i);
 				
-				if(row.getString("from").equals(user.get("customerId")))
+				if(row.getString("from_user").equals(user.get("customerId")))
 					chatList1.add(new Conversation(
 							row.getString("msg"),
 							Utility.convertDateToLocalTimeZoneAndReadable(row.getString("datetime")),

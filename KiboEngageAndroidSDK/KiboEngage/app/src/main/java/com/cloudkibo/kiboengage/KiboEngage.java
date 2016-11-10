@@ -247,6 +247,27 @@ public class KiboEngage {
         return false;
     }
 
+    private static JSONObject getSessionFromServerList(String groupid, String channelid){
+
+        for (int i=0; i < sessions.length(); i++) {
+            try {
+                JSONObject row = sessions.getJSONObject(i);
+
+                if(row.getString("departmentid").equals(groupid)){
+                    if(row.getJSONArray("messagechannel").getString(row.getJSONArray("messagechannel").length()-1).equals(channelid))
+                        return row;
+                }
+
+
+            }catch(JSONException e){
+                e.printStackTrace();
+            }
+
+        }
+
+        return null;
+    }
+
     private static void createSessions(){
 
         new AsyncTask<String, String, JSONObject>() {
@@ -287,6 +308,9 @@ public class KiboEngage {
                                 sessionObj.put("request_id", uniqueid);
 
                                 sessionInfo.put(sessionObj);
+                            } else {
+                                JSONObject sessionFromServerList = getSessionFromServerList(groupId, channelId);
+                                uniqueid = sessionFromServerList.getString("request_id");
                             }
 
                             db = new DatabaseHandler(appContext);
