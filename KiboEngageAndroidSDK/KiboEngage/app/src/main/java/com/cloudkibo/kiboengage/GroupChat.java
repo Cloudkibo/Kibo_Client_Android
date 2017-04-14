@@ -1,6 +1,7 @@
 package com.cloudkibo.kiboengage;
 
 import android.content.Context;
+import android.media.MediaPlayer;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
@@ -62,6 +63,9 @@ public class GroupChat extends AppCompatActivity
 
 	private Button sendBtn;
 
+	public static GroupChat groupChat;
+	public static Boolean isVisible = false;
+
 	/* (non-Javadoc)
 	 * @see android.support.v4.app.Fragment#onCreateView(android.view.LayoutInflater, android.view.ViewGroup, android.os.Bundle)
 	 */
@@ -70,6 +74,8 @@ public class GroupChat extends AppCompatActivity
 	{
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.kiboengage_sdk_group_chat);
+
+		groupChat = this;
 
 		groupId = getIntent().getExtras().getString("groupid");
 		channelId = getIntent().getExtras().getString("channelid");
@@ -154,20 +160,22 @@ public class GroupChat extends AppCompatActivity
 	
 	public void receiveMessage(String msg, String uniqueid, String from, String date) {
 
-		/*try {
+		try {
 
 			final MediaPlayer mp = MediaPlayer.create(getApplicationContext(), R.raw.bell);
 			mp.start();
 
-			// todo see if this really needs the uniqueid and status
-			convList.add(new Conversation(msg, Utility.convertDateToLocalTimeZoneAndReadable(date), false, true, "seen", uniqueid));
+			convList.add(new Conversation(
+					msg,
+					Utility.convertDateToLocalTimeZoneAndReadable(date),
+					false, true, "seen", uniqueid, "message"));
 
 			adp.notifyDataSetChanged();
 
 			sendMessageStatusUsingAPI("seen", uniqueid, from);
 		} catch (ParseException e){
 			e.printStackTrace();
-		}*/
+		}
 		
 	}
 
@@ -193,6 +201,7 @@ public class GroupChat extends AppCompatActivity
 						params.add(new BasicNameValuePair("messagechannel", channelId));
 						params.add(new BasicNameValuePair("companyid", user.get("clientId")));
 						params.add(new BasicNameValuePair("is_seen", "no"));
+						params.add(new BasicNameValuePair("status", "pending"));
 						params.add(new BasicNameValuePair("time", (new Date().getHours()) + "," + (new Date().getMinutes())));
 						params.add(new BasicNameValuePair("fromMobile", "yes"));
 					} else {
@@ -210,6 +219,7 @@ public class GroupChat extends AppCompatActivity
 						params.add(new BasicNameValuePair("messagechannel", channelId));
 						params.add(new BasicNameValuePair("companyid", user.get("clientId")));
 						params.add(new BasicNameValuePair("is_seen", "no"));
+						params.add(new BasicNameValuePair("status", "pending"));
 						params.add(new BasicNameValuePair("socketid", "no socket id given, we dont use socket"));
 						params.add(new BasicNameValuePair("time", (new Date().getHours()) + "," + (new Date().getMinutes())));
 						params.add(new BasicNameValuePair("fromMobile", "yes"));
@@ -266,6 +276,7 @@ public class GroupChat extends AppCompatActivity
 						params.add(new BasicNameValuePair("messagechannel", channelId));
 						params.add(new BasicNameValuePair("companyid", user.get("clientId")));
 						params.add(new BasicNameValuePair("is_seen", "no"));
+						params.add(new BasicNameValuePair("status", "pending"));
 						params.add(new BasicNameValuePair("time", (new Date().getHours()) + "," + (new Date().getMinutes())));
 						params.add(new BasicNameValuePair("fromMobile", "yes"));
 					} else {
@@ -283,6 +294,7 @@ public class GroupChat extends AppCompatActivity
 						params.add(new BasicNameValuePair("messagechannel", channelId));
 						params.add(new BasicNameValuePair("companyid", user.get("clientId")));
 						params.add(new BasicNameValuePair("is_seen", "no"));
+						params.add(new BasicNameValuePair("status", "pending"));
 						params.add(new BasicNameValuePair("socketid", "no socket id given, we dont use socket"));
 						params.add(new BasicNameValuePair("time", (new Date().getHours()) + "," + (new Date().getMinutes())));
 						params.add(new BasicNameValuePair("fromMobile", "yes"));
@@ -372,6 +384,35 @@ public class GroupChat extends AppCompatActivity
 
 	}
 
+	@Override
+	protected void onDestroy() {
+		super.onDestroy();
+	}
+
+	@Override
+	protected void onResume() {
+
+		isVisible = true;
+
+	}
+
+	@Override
+	protected void onStart() {
+		super.onStart();
+		isVisible = true;
+	}
+
+	@Override
+	protected void onPause() {
+		super.onPause();
+		isVisible = false;
+	}
+
+	@Override
+	protected void onStop() {
+		super.onStop();
+		isVisible = false;
+	}
 	
 	public void loadChatFromDatabase(){
 		DatabaseHandler db = new DatabaseHandler(getApplicationContext());

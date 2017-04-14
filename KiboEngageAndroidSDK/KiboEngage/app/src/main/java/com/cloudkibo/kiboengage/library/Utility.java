@@ -5,6 +5,7 @@ import android.os.AsyncTask;
 import android.provider.ContactsContract;
 import android.util.Log;
 
+import com.cloudkibo.kiboengage.GroupChat;
 import com.cloudkibo.kiboengage.database.DatabaseHandler;
 import com.cloudkibo.kiboengage.network.UserFunctions;
 
@@ -42,36 +43,6 @@ public class Utility {
         String result = df.format(date.getTime() + currentOffsetFromUTC);
 
         return result;
-
-        /*
-        TimeZone tz = TimeZone.getDefault();
-        String gmt1= TimeZone.getTimeZone(tz.getID()).getDisplayName(false, TimeZone.SHORT);
-        String gmt2= TimeZone.getTimeZone(tz.getID()).getDisplayName(false, TimeZone.LONG);
-        Log.d("Tag","TimeZone : "+gmt1+"\t"+gmt2);
-
-        boolean additionRequired = (gmt1.contains("+"));
-        String hourOffset = gmt1.substring(4, 6);
-        String minuteOffset = gmt1.substring(7, 9);
-
-        Calendar cal = Calendar.getInstance(); // creates calendar
-        cal.setTime(date); // sets calendar time/date
-        if(additionRequired) {
-            cal.add(Calendar.HOUR_OF_DAY, Integer.parseInt(hourOffset)); // adds hours
-            cal.add(Calendar.MINUTE, Integer.parseInt(minuteOffset)); // adds minutes
-        } else {
-            cal.add(Calendar.HOUR_OF_DAY, Integer.parseInt(hourOffset) * (-1)); // adds hours
-            cal.add(Calendar.MINUTE, Integer.parseInt(minuteOffset) * (-1)); // adds minutes
-        }
-        Date date2 = cal.getTime();
-
-        cal.setTime(date2);
-
-        return  String.format("%02d", cal.get(Calendar.DATE)) +"-"+
-                String.format("%02d", (cal.get(Calendar.MONTH)+1)) +"-"+
-                String.format("%02d", cal.get(Calendar.YEAR)) +" "+
-                String.format("%02d", cal.get(Calendar.HOUR_OF_DAY)) +":"+
-                String.format("%02d", cal.get(Calendar.MINUTE));
-        */
     }
 
     public static String getCurrentTimeInISO(){
@@ -238,6 +209,11 @@ public class Utility {
                             row.getString("type"), row.getString("status"), row.getString("msg"),
                             row.getString("request_id"), row.getString("messagechannel"), row.getString("companyid"),
                             row.getString("datetime"));
+                    if (GroupChat.groupChat.isVisible) {
+                        GroupChat.groupChat.receiveMessage(row.getString("msg"),
+                                row.getString("uniqueid"), row.getString("from"),
+                                row.getString("datetime"));
+                    }
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }

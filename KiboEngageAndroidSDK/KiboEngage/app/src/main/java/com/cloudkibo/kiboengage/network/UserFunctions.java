@@ -32,7 +32,7 @@ public class UserFunctions {
     private static String getBulkSMSURL =           baseURL + "/api/notifications/fetchbulksms";
     private static String getBulkSMSListURL =       baseURL + "/api/notifications/";
     private static String saveChatURL =             baseURL + "/api/userchats/create";
-    private static String sendChatURL =             "http://kiboengage.cloudapp.net/api/getchat";
+    private static String sendChatURL =             "https://kiboengage.kibosupport.com/api/getchat";
     private static String fetchChatURL =            baseURL + "/api/userchats/fetchChat";
 
 
