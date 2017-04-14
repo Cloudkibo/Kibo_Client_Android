@@ -49,6 +49,7 @@ public class MyHandler extends NotificationsHandler {
     }
 
     private void processNotification(String msg){
+        Log.i("MyHandler", "Process push notification: "+ msg);
         JSONObject payload;
         try{
             payload = new JSONObject(msg);
@@ -62,8 +63,13 @@ public class MyHandler extends NotificationsHandler {
                 } else {
                     Utility.handleGroupNotification(ctx, payload);
                 }
-            } else if(payload.has("uniqueid") && payload.has("request_id")) {
+            } else if(payload.has("uniqueid") && payload.has("request_id") && !payload.has("status")) {
+                Log.i("MyHandler", "Fetching chat message now");
                 Utility.fetchChatMessage(ctx, payload);
+            } else if(payload.has("uniqueid") && payload.has("request_id") && payload.has("status")) {
+                Log.i("MyHandler", "Updating chat message now");
+                Utility.updateStatusOfSentMessage(ctx, payload.getString("status"),
+                        payload.getString("uniqueid"), payload.getString("request_id"));
             //} else if(payload.has("agentname") && payload.has("agentemail") && payload.has("agentid")) {
             //    Utility.handleSessionAssignment(ctx, payload);
             }// else {

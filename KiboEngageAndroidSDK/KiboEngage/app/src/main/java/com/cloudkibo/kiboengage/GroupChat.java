@@ -172,6 +172,8 @@ public class GroupChat extends AppCompatActivity
 
 			adp.notifyDataSetChanged();
 
+			Log.i("GROUPCHAT", "Received chat message on UI");
+
 			sendMessageStatusUsingAPI("seen", uniqueid, from);
 		} catch (ParseException e){
 			e.printStackTrace();
@@ -393,6 +395,7 @@ public class GroupChat extends AppCompatActivity
 	protected void onResume() {
 
 		isVisible = true;
+		super.onResume();
 
 	}
 

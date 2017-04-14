@@ -186,30 +186,39 @@ public class Utility {
 
                 try {
                     params.add(new BasicNameValuePair("uniqueid", payload.getString("uniqueid")));
-                    params.add(new BasicNameValuePair("request_id", "request_id"));
+                    params.add(new BasicNameValuePair("request_id", payload.getString("request_id")));
                 } catch (JSONException e){
+                    Log.e("UTILITY", e.toString());
                     e.printStackTrace();
                 }
 
                 DatabaseHandler db = new DatabaseHandler(appContext);
                 HashMap<String, String> user = db.getUserDetails();
-                return userFunction.fetchChat(params, user.get("appId"), user.get("clientId"), user.get("appSecret`"));
+                Log.i("UTILITY", "Sending Parameter to fetch chat: "+ params);
+                Log.i("UTILITY", "Sending credentials to fetch chat: "+ user);
+                return userFunction.fetchChat(params, user.get("appId"), user.get("clientId"), user.get("appSecret"));
             }
 
             @Override
             protected void onPostExecute(JSONArray jsonA) {
-                Log.d("KIBO_ENGAGE", "Fetch Chat: "+ jsonA.toString());
+                Log.d("UTILITY", "Got the Fetch Chat: "+ jsonA.toString());
                 try {
                     JSONObject row = jsonA.getJSONObject(0);
                     DatabaseHandler db = new DatabaseHandler(appContext);
-                    String agentemail = row.getJSONArray("agentemail").getString(row.getJSONArray("agentemail").length()-1);
-                    String agentid = row.getJSONArray("agentid").getString(row.getJSONArray("agentid").length()-1);
+                    String agentemail = "";
+                    String agentid = "";
+                    if(row.getJSONArray("agentemail").length()>0)
+                        agentemail = row.getJSONArray("agentemail").getString(row.getJSONArray("agentemail").length()-1);
+                    if(row.getJSONArray("agentid").length()>0)
+                        agentid = row.getJSONArray("agentid").getString(row.getJSONArray("agentid").length()-1);
                     db.addChat(row.getString("to"), row.getString("from"), row.getString("uniqueid"),
                             row.getString("visitoremail"), agentemail, agentid, row.getString("is_seen"),
                             row.getString("type"), row.getString("status"), row.getString("msg"),
                             row.getString("request_id"), row.getString("messagechannel"), row.getString("companyid"),
                             row.getString("datetime"));
+                    Log.i("UTILITY", "Chat fetched stored in db");
                     if (GroupChat.groupChat.isVisible) {
+                        Log.i("UTILITY", "Going to show the chat message on UI now");
                         GroupChat.groupChat.receiveMessage(row.getString("msg"),
                                 row.getString("uniqueid"), row.getString("from"),
                                 row.getString("datetime"));
@@ -221,6 +230,16 @@ public class Utility {
 
         }.execute();
 
+    }
+
+    public static void updateStatusOfSentMessage(Context appContext, String status, String uniqueid,
+                                                 String request_id) {
+        if (GroupChat.groupChat.isVisible) {
+            Log.i("UTILITY", "Going to update chat message status on UI now");
+            GroupChat.groupChat.updateStatusSentMessage(status, uniqueid);
+            DatabaseHandler db = new DatabaseHandler(appContext);
+            db.updateChat(status, uniqueid);
+        }
     }
 
 }
