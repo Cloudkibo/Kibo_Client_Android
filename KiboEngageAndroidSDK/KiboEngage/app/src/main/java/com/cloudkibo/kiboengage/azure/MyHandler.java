@@ -63,15 +63,19 @@ public class MyHandler extends NotificationsHandler {
                 } else {
                     Utility.handleGroupNotification(ctx, payload);
                 }
-            } else if(payload.has("uniqueid") && payload.has("request_id") && !payload.has("status")) {
+            } else if(payload.has("uniqueid") && payload.has("request_id") && !payload.has("status")
+                    && !payload.has("agentemail")) {
                 Log.i("MyHandler", "Fetching chat message now");
                 Utility.fetchChatMessage(ctx, payload);
-            } else if(payload.has("uniqueid") && payload.has("request_id") && payload.has("status")) {
+            } else if(payload.has("uniqueid") && payload.has("request_id") && payload.has("status")
+                    && !payload.has("agentemail")) {
                 Log.i("MyHandler", "Updating chat message now");
                 Utility.updateStatusOfSentMessage(ctx, payload.getString("status"),
                         payload.getString("uniqueid"), payload.getString("request_id"));
-            //} else if(payload.has("agentname") && payload.has("agentemail") && payload.has("agentid")) {
-            //    Utility.handleSessionAssignment(ctx, payload);
+            } else if(payload.has("agentname") && payload.has("agentemail") && payload.has("agentid")
+                    && payload.has("request_id")) {
+                Log.i("MyHandler", "Agent is assigned");
+                Utility.handleSessionAssignment(ctx, payload);
             }// else {
                 sendNotification(msg);
             //}

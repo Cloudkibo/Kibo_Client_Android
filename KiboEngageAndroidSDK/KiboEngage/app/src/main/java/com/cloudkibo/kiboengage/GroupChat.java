@@ -206,6 +206,7 @@ public class GroupChat extends AppCompatActivity
 						params.add(new BasicNameValuePair("status", "pending"));
 						params.add(new BasicNameValuePair("time", (new Date().getHours()) + "," + (new Date().getMinutes())));
 						params.add(new BasicNameValuePair("fromMobile", "yes"));
+						params.add(new BasicNameValuePair("departmentid", groupId));
 					} else {
 						params.add(new BasicNameValuePair("from", user.get("customerId")));
 						params.add(new BasicNameValuePair("to", session.getString("agent_name")));
@@ -225,6 +226,7 @@ public class GroupChat extends AppCompatActivity
 						params.add(new BasicNameValuePair("socketid", "no socket id given, we dont use socket"));
 						params.add(new BasicNameValuePair("time", (new Date().getHours()) + "," + (new Date().getMinutes())));
 						params.add(new BasicNameValuePair("fromMobile", "yes"));
+						params.add(new BasicNameValuePair("departmentid", groupId));
 					}
 				} catch (JSONException e){
 					e.printStackTrace();
@@ -281,6 +283,7 @@ public class GroupChat extends AppCompatActivity
 						params.add(new BasicNameValuePair("status", "pending"));
 						params.add(new BasicNameValuePair("time", (new Date().getHours()) + "," + (new Date().getMinutes())));
 						params.add(new BasicNameValuePair("fromMobile", "yes"));
+						params.add(new BasicNameValuePair("departmentid", groupId));
 					} else {
 						params.add(new BasicNameValuePair("from", user.get("customerId")));
 						params.add(new BasicNameValuePair("to", session.getString("agent_name")));
@@ -300,6 +303,7 @@ public class GroupChat extends AppCompatActivity
 						params.add(new BasicNameValuePair("socketid", "no socket id given, we dont use socket"));
 						params.add(new BasicNameValuePair("time", (new Date().getHours()) + "," + (new Date().getMinutes())));
 						params.add(new BasicNameValuePair("fromMobile", "yes"));
+						params.add(new BasicNameValuePair("departmentid", groupId));
 					}
 				} catch (JSONException e){
 					e.printStackTrace();

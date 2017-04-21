@@ -366,6 +366,29 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         db.close();
     }
 
+
+    /////////////////////////////////////////////////////////////////////
+    // Updating session information in database                        //
+    /////////////////////////////////////////////////////////////////////
+
+    public void updateSession(String agent_email, String agent_id, String agent_name, String request_id) {
+
+        SQLiteDatabase db = this.getWritableDatabase();
+
+        String updateQuery = "UPDATE SESSIONS SET agent_email='"+
+                agent_email +"', agent_id='"+ agent_id+", agent_name='"+
+                agent_name+" WHERE request_id='"+request_id+"'";
+
+        try {
+            db.execSQL(updateQuery);
+            Log.i("DatabaseHandler", "Sessions table record updated");
+        } catch (Exception e){
+            e.printStackTrace();
+        }
+
+        db.close();
+    }
+
     /////////////////////////////////////////////////////////////////////
     // Getting user data from database                                 //
     /////////////////////////////////////////////////////////////////////

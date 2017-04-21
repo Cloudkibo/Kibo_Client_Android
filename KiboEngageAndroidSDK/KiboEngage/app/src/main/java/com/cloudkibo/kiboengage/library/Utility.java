@@ -174,7 +174,25 @@ public class Utility {
 
     }
 
-    public static void fetchChatMessage(final Context appContext, final JSONObject payload){
+    public static void handleSessionAssignment(final Context appContext, final JSONObject payload){
+
+        try {
+
+            DatabaseHandler db = new DatabaseHandler(appContext);
+
+            db.updateSession(payload.getJSONArray("agentemail").getString(0),
+                    payload.getJSONArray("agentid").getString(0),
+                    payload.getJSONArray("agentname").getString(0), payload.getString("request_id"));
+
+            fetchChatMessage(appContext, payload);
+
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+    }
+
+    public static void fetchChatMessage(final Context appContext, final JSONObject payload) {
 
         new AsyncTask<String, String, JSONArray>() {
 
