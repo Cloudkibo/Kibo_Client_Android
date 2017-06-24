@@ -166,6 +166,8 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
+
+
     /**
      * Check the device to make sure it has the Google Play Services APK. If
      * it doesn't, display a dialog that allows users to download the APK from
@@ -230,5 +232,59 @@ public class MainActivity extends AppCompatActivity {
                 //helloText.setText(notificationMessage);
             }
         });
+    }
+
+    // todo new work done
+    private class GroupAdapter2 extends BaseAdapter
+    {
+        Context context;
+
+        public GroupAdapter(Context appContext){
+            context = appContext;
+        }
+        /* (non-Javadoc)
+         * @see android.widget.Adapter#getCount()
+         */
+        @Override
+        public int getCount()
+        {
+            return groupList.size();
+        }
+
+        /* (non-Javadoc)
+         * @see android.widget.Adapter#getItem(int)
+         */
+        @Override
+        public GroupItem getItem(int arg0)
+        {
+            return groupList.get(arg0);
+        }
+
+        /* (non-Javadoc)
+         * @see android.widget.Adapter#getItemId(int)
+         */
+        @Override
+        public long getItemId(int arg0)
+        {
+            return arg0;
+        }
+
+        /* (non-Javadoc)
+         * @see android.widget.Adapter#getView(int, android.view.View, android.view.ViewGroup)
+         */
+        @Override
+        public View getView(int pos, View v, ViewGroup arg2)
+        {
+            if (v == null)
+                v = LayoutInflater.from(this.context).inflate(
+                        R.layout.kiboengage_sdk_list_item, null);
+
+            GroupItem c = getItem(pos);
+            TextView lbl = (TextView) v.findViewById(R.id.lblContactDisplayName);
+            lbl.setText(c.getName());
+
+            return v;
+        }
+
     }
 }
