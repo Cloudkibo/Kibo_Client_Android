@@ -120,6 +120,19 @@ public class Utility {
         }
     }
 
+    public static void handleChangeSubGroupOfSession(Context ctx, JSONObject payload){
+        try{
+            DatabaseHandler db = new DatabaseHandler(ctx);
+            String request = payload.getString("request_id");
+            String subgroup = payload.getString("new_subgroup_id");
+            db.updateSubGroupForChat(request, subgroup);
+            db = new DatabaseHandler(ctx);
+            db.updateSubGroupForSession(request, subgroup);
+        } catch (JSONException e){
+            e.printStackTrace();
+        }
+    }
+
     private static void createSessions(final Context appContext, final String customerId, final String companyId,
                                        final String groupId, final String channelId, final String appId,
                                        final String clientId, final String appSecret){

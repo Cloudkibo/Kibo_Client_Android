@@ -366,6 +366,24 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         db.close();
     }
 
+    /////////////////////////////////////////////////////////////////////
+    // Updating chat message sub group id in database                        //
+    /////////////////////////////////////////////////////////////////////
+
+    public void updateSubGroupForChat(String request_id, String sub_group_id) {
+
+        SQLiteDatabase db = this.getWritableDatabase();
+
+        String updateQuery = "UPDATE CHATS SET messagechannel='"+ sub_group_id +"' WHERE request_id='"+request_id+"'";
+
+        try {
+            db.execSQL(updateQuery);
+        } catch (Exception e){
+            e.printStackTrace();
+        }
+
+        db.close();
+    }
 
     /////////////////////////////////////////////////////////////////////
     // Updating session information in database                        //
@@ -378,6 +396,27 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         String updateQuery = "UPDATE SESSIONS SET agent_email='"+
                 agent_email +"', agent_id='"+ agent_id+", agent_name='"+
                 agent_name+" WHERE request_id='"+request_id+"'";
+
+        try {
+            db.execSQL(updateQuery);
+            Log.i("DatabaseHandler", "Sessions table record updated");
+        } catch (Exception e){
+            e.printStackTrace();
+        }
+
+        db.close();
+    }
+
+    /////////////////////////////////////////////////////////////////////
+    // Updating session information for assignment to new in database                        //
+    /////////////////////////////////////////////////////////////////////
+
+    public void updateSubGroupForSession(String request_id, String sub_group_id) {
+
+        SQLiteDatabase db = this.getWritableDatabase();
+
+        String updateQuery = "UPDATE SESSIONS SET msg_channel_id='"+
+                sub_group_id +"' WHERE request_id='"+request_id+"'";
 
         try {
             db.execSQL(updateQuery);

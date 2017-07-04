@@ -19,9 +19,14 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        String name = getIntent().getExtras().getString("name");
+        String phone = getIntent().getExtras().getString("phone");
+        String email = getIntent().getExtras().getString("email");
+        String customer_id = getIntent().getExtras().getString("customer_id");
+
         com.cloudkibo.kiboengage.KiboEngage.initialize(getApplicationContext(), "5wdqvvi8jyvfhxrxmu73dxun9za8x5u6n59",
-                "cd89f71715f2014725163952", "jcmhec567tllydwhhy2z692l79j8bkxmaa98do1bjer16cdu5h79xvx", "sojharo",
-                "Sojharo Mangi", "+923323800399", "sojharo@live.com");
+                "cd89f71715f2014725163952", "jcmhec567tllydwhhy2z692l79j8bkxmaa98do1bjer16cdu5h79xvx", customer_id,
+                name, phone, email);
 
         btn = (Button) findViewById(R.id.button);
 

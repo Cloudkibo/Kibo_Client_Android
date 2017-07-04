@@ -57,6 +57,8 @@ public class MyHandler extends NotificationsHandler {
             if(payload.has("type")) {
                 if(payload.getString("type").equals("bulksms"))
                     loadBulkSmsFromServer(payload);
+                if(payload.getString("type").equals("session_assigned_to_other_subgroup"))
+                    Utility.handleChangeSubGroupOfSession(ctx, payload);
             } else if(payload.has("tablename") && payload.has("operation")) {
                 if(payload.getString("tablename").equals("Channels")){
                     Utility.handleChannelNotification(ctx, payload);
